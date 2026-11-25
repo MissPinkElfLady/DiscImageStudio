@@ -24,6 +24,7 @@ internal static class SelfTests
         TestImageMapping();
         TestIsoOutput();
         TestCalibrationAndRange();
+        Diffraction.DiffractionSelfTests.Run();
         Console.WriteLine("selftest: all checks passed");
     }
 

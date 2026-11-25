@@ -25,6 +25,7 @@ internal static class Program
                 "encode" => Encode(CliArguments.Parse(args.AsSpan(1))),
                 "calibrate" => Calibrate(CliArguments.Parse(args.AsSpan(1))),
                 "simulate" => Simulate(CliArguments.Parse(args.AsSpan(1))),
+                "diffract" => Diffract(CliArguments.Parse(args.AsSpan(1))),
                 "selftest" => RunSelfTests(),
                 _ => throw new ArgumentException($"Unknown command '{args[0]}'."),
             };
@@ -1337,6 +1338,43 @@ internal static class Program
                 }));
     }
 
+    private static int Diffract(CliArguments arguments)
+    {
+        string layoutPath = arguments.Require("layout");
+        string isoPath = arguments.Require("iso-output");
+        var loaded = Diffraction.DiffractionProject.Load(layoutPath);
+        uint sectors = arguments.Has("sectors")
+            ? arguments.GetUInt("sectors", 0)
+            : loaded.Layout.LastSector(loaded.TotalSectors);
+        if (sectors == 0 || sectors % DvdEccBlockEncoder.SectorCount != 0)
+            throw new ArgumentException("--sectors must be a positive multiple of 16.");
+        uint psnOffset = arguments.GetUInt("psn-offset", 0x30000);
+        int parallelism = arguments.GetInt("parallelism", 0);
+        foreach (var (from, to, bridge) in loaded.Layout.Bridges)
+        {
+            Console.WriteLine(bridge is byte b
+                ? $"bridge: 0x{from:X2} -> 0x{to:X2} written as 0x{from:X2} 0x{b:X2} 0x{to:X2}"
+                : $"warning: 0x{from:X2} -> 0x{to:X2} leaves the recorder a choice and has no bridge");
+        }
+
+        int lastPercent = -1;
+        var summary = Diffraction.DiffractionProject.WriteIso(loaded, isoPath, sectors, psnOffset, parallelism, p =>
+        {
+            int percent = (int)(p.Fraction * 100);
+            if (percent / 10 != lastPercent / 10) Console.WriteLine($"{percent}%");
+            lastPercent = percent;
+        });
+        Console.WriteLine($"Wrote {summary.SectorsWritten} sectors ({summary.BytesWritten:N0} bytes) to {isoPath} in {summary.Elapsed.TotalSeconds:F1} s.");
+        foreach (var picture in loaded.Layout.Pictures)
+        {
+            string shares = string.Join(", ", Enumerable.Range(0, picture.ViewCount)
+                .Select(v => $"0x{picture.Carriers[v]:X2} lit {picture.LitShare(v):P0}"));
+            Console.WriteLine($"{picture.Name}: {picture.Nx} x {picture.Ny} cells; {shares}");
+        }
+
+        return 0;
+    }
+
     private static int RunSelfTests()
     {
         SelfTests.Run();
@@ -1352,6 +1390,10 @@ internal static class Program
             Solve one 16-sector ECC Block:
               DvdImageSolver solve (--target TARGET.txt | --image IMAGE.png)
                 (--output payload.bin | --iso-output image.iso) [options]
+
+            Write diffraction pictures (DVD-R; see Diffraction/DiffractionProject.cs for the layout file):
+              DvdImageSolver diffract --layout layout.json --iso-output image.iso
+                [--sectors N] [--psn-offset 0x30000] [--parallelism 0]
 
             Encode one 32768-byte payload block:
               DvdImageSolver encode --input payload.bin --output channel.bin [options]
