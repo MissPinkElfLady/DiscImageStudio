@@ -1,0 +1,14 @@
+{
+  // Disc calibration: point "discproj" at a DVD project saved by Disc Image Studio after calibration,
+  // or give the numbers under "geometry" instead.
+  "discproj": "MyDVDCalibration.discproj",
+  "pictures": [
+    {
+      "name": "eyes",
+      "centerMm": [0, 43],
+      "sizeMm": [24, 24],
+      "effect": "flip",
+      "images": ["eyes-open.png", "eyes-closed.png"]
+    }
+  ]
+}

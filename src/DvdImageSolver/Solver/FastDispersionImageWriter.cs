@@ -49,6 +49,9 @@ public sealed record FastDispersionProgress(
     long ControlledWords,
     TimeSpan Elapsed);
 
+/// <summary>Fills the scrambled payload bytes Q (16 x 2048, recording order) of the ECC block at <paramref name="firstLba"/>.</summary>
+public delegate void ScrambledBlockFiller(uint firstLba, Span<byte> scrambledPayload);
+
 public static class FastDispersionImageWriter
 {
     private static readonly int[] PayloadChannelCenters = BuildPayloadChannelCenters();
@@ -213,6 +216,44 @@ public static class FastDispersionImageWriter
         PayloadImageSampler sampler = new(
             sampleScrambledByte, options.ImageMapping, samplesScrambledBytes: true);
         return WriteSampledStream(sampler, output, options, progress, cancellationToken);
+    }
+
+    /// <summary>
+    /// Streams whole ECC blocks whose scrambled payload bytes Q are chosen by the caller, before
+    /// EFMPlus modulation; the output contains user payload P = Q XOR each sector's scrambler mask.
+    /// Unlike <see cref="WriteScrambledCodewordPatternStream"/>, the callback sees all 16 x 2048 bytes
+    /// of a block at once, so a byte may depend on its neighbours (diffraction carriers need this for
+    /// their bridge bytes). The callback must support concurrent calls when parallel generation is enabled.
+    /// </summary>
+    public static FastDvdStreamSummary WriteScrambledBlockStream(
+        ScrambledBlockFiller fillScrambledBlock,
+        Stream output,
+        MultiBlockSolveOptions options,
+        Action<FastDvdStreamProgress>? progress = null,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(fillScrambledBlock);
+        ValidateStream(output, options);
+        if (options.ReadCompatibility)
+            throw new ArgumentException(
+                "Read compatibility cannot be used with an exact scrambled-byte pattern.", nameof(options));
+        GeneratedBlock Fill(int index, byte[] buffer)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            uint lba = checked(options.StartLba + (uint)index * DvdEccBlockEncoder.SectorCount);
+            fillScrambledBlock(lba, buffer);
+            for (uint offset = 0; offset < DvdEccBlockEncoder.SectorCount; offset++)
+            {
+                DvdDataFrameBuilder.TransformPayloadScrambling(
+                    buffer.AsSpan((int)offset * DvdEccBlockEncoder.PayloadBytesPerSector,
+                        DvdEccBlockEncoder.PayloadBytesPerSector),
+                    lba + offset + options.PsnOffset);
+            }
+
+            return new GeneratedBlock(lba, buffer, buffer.Length);
+        }
+
+        return WriteBlockStream(Fill, output, options, progress, cancellationToken);
     }
 
     private static void ValidateStream(Stream output, MultiBlockSolveOptions options)
