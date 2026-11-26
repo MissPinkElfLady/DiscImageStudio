@@ -174,6 +174,13 @@ internal sealed class DiffractionPicture
         return Carriers[v].Group?.Variant is byte[,] map ? code + map[j, i] : code;
     }
 
+    /// <summary>The view that turn <paramref name="turn"/> belongs to (see <see cref="CodeFor"/>).</summary>
+    internal int ViewOfTurn(long turn)
+    {
+        long cycle = _cycle.Length;
+        return _cycle[(int)(((turn % cycle) + cycle) % cycle)];
+    }
+
     /// <summary>Mean lit share of the view (1 = every cell fully lit for that view).</summary>
     internal double LitShare(int view)
     {

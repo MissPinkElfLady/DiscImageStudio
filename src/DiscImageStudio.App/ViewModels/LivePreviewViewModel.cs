@@ -140,6 +140,7 @@ public partial class LivePreviewViewModel : ObservableObject
         _state = state;
         Inspector = new PreviewInspectorViewModel(shell, state);
         _state.PropertyChanged += State_PropertyChanged;
+        SyncDvdReadbackColor(quiet: true);
         _livePreviewTimer = new DispatcherTimer
         {
             Interval = TimeSpan.FromMilliseconds(450),
@@ -180,6 +181,7 @@ public partial class LivePreviewViewModel : ObservableObject
         else if (e.PropertyName == nameof(DiscParametersState.DvdIsoPath))
         {
             AdoptIsoMetadata(_state.DvdIsoPath.Trim());
+            SyncDvdReadbackColor();
             DownloadPreviewCommand.NotifyCanExecuteChanged();
             RaiseEmptyStateAction();
         }
@@ -931,13 +933,17 @@ public partial class LivePreviewViewModel : ObservableObject
         CancellationTokenSource cancellation = new();
         _livePreviewCancellation = cancellation;
 
-        if (_state.DvdColor)
+        if (IsCalibrationPreview && _state.DvdColor)
         {
             await RefreshDvdColorAsync(revision, cancellation.Token);
         }
         else if (IsCalibrationPreview)
         {
             await RefreshDvdCalibrationAsync(revision, cancellation.Token);
+        }
+        else if (FollowRewrittenDvdSidecarThen(() => DvdReadbackColor))
+        {
+            await RefreshDvdColorReadbackAsync(revision, cancellation.Token);
         }
         else
         {
@@ -1007,9 +1013,107 @@ public partial class LivePreviewViewModel : ObservableObject
         }
     }
 
-    /// <summary>Colour mode: the colour picture as it is written (from the design composite, laid out on the
-    /// generated geometry) projected onto the measured one. There is no colour read-back of an ISO, so both
-    /// preview modes show this.</summary>
+    /// <summary>How the read-back decodes the ISO: grayscale bytes, or the colour turns of a colour picture.
+    /// Set from the ISO's sidecar when one is picked; the user can override it.</summary>
+    [ObservableProperty]
+    private bool _dvdReadbackColor;
+
+    private DateTime? _dvdReadbackSidecarStamp;
+    private bool _syncingDvdReadbackColor;
+
+    partial void OnDvdReadbackColorChanged(bool value)
+    {
+        if (!_syncingDvdReadbackColor && !IsCalibrationPreview) Schedule();
+    }
+
+    /// <summary>The app writes the picture type into the ISO's sidecar; without one, follow the project.
+    /// <paramref name="quiet"/> updates the switch without scheduling another refresh.</summary>
+    private void SyncDvdReadbackColor(bool quiet = false)
+    {
+        string isoPath = _state.DvdIsoPath.Trim();
+        bool exists = isoPath.Length > 0 && File.Exists(isoPath);
+        _dvdReadbackSidecarStamp = exists && File.Exists(isoPath + ".json")
+            ? File.GetLastWriteTimeUtc(isoPath + ".json") : null;
+        bool color = (exists ? DvdImageSolver.Diffraction.DiffractionColorDisc.IsColorIso(isoPath) : null) ?? _state.DvdColor;
+        _syncingDvdReadbackColor = quiet;
+        try
+        {
+            DvdReadbackColor = color;
+        }
+        finally
+        {
+            _syncingDvdReadbackColor = false;
+        }
+    }
+
+    private bool FollowRewrittenDvdSidecarThen(Func<bool> read)
+    {
+        FollowRewrittenDvdSidecar();
+        return read();
+    }
+
+    /// <summary>Re-exporting to the same path rewrites the sidecar without changing the path: follow it.</summary>
+    private void FollowRewrittenDvdSidecar()
+    {
+        string isoPath = _state.DvdIsoPath.Trim();
+        if (isoPath.Length == 0 || !File.Exists(isoPath + ".json")) return;
+        if (File.GetLastWriteTimeUtc(isoPath + ".json") != _dvdReadbackSidecarStamp) SyncDvdReadbackColor(quiet: true);
+    }
+
+    /// <summary>Colour read-back: every turn carries one colour, so the share of grating bytes per colour
+    /// in each pixel is decoded straight from the ISO.</summary>
+    private async Task RefreshDvdColorReadbackAsync(int revision, CancellationToken cancellationToken)
+    {
+        string? outputPath = null;
+        if (!TryBuildDvdReadbackOptions(out string isoPath, out IsoReadbackOptions options, out string message))
+        {
+            SetLivePreviewUnavailable(message);
+            return;
+        }
+
+        int outputSize = options.PreviewSize;
+        StatusText = L.Format("DvdColor.PreviewRefreshing", outputSize);
+        bool keepOutput = false;
+        try
+        {
+            outputPath = TempFiles.GetCacheFilePath($"dvd-live-colour-readback-{revision}.png");
+            await StaWorker.RunAsync(() =>
+            {
+                var range = IsoReadbackRenderer.ReadDrawingRange(isoPath, options.TotalSectors);
+                DvdImageSolver.Diffraction.DiffractionColorDisc.RenderReadback(isoPath, outputPath,
+                    options with { StartLba = range.StartLba, FillSectors = range.FillSectors }, cancellationToken);
+                return 0;
+            });
+
+            cancellationToken.ThrowIfCancellationRequested();
+            if (revision != _livePreviewRevision)
+            {
+                return;
+            }
+
+            PublishPreview(outputPath, isoPath, "预览 - DVD", false);
+            keepOutput = true;
+            SetReadyStatus(() => L.Format("DvdColor.ReadbackReady", outputSize, options.SamplesPerSector));
+        }
+        catch (OperationCanceledException)
+        {
+        }
+        catch (Exception exception)
+        {
+            ReportPreviewFailure(revision, cancellationToken, exception,
+                () => JobDiagnostics.FormatLog($"DVD colour read-back · {options}", exception));
+        }
+        finally
+        {
+            if (!keepOutput)
+            {
+                TempFiles.TryDeleteTemporaryFile(outputPath);
+            }
+        }
+    }
+
+    /// <summary>Design projection in colour mode: the colour picture as it is written (from the design
+    /// composite, laid out on the generated geometry) projected onto the measured one.</summary>
     private async Task RefreshDvdColorAsync(int revision, CancellationToken cancellationToken)
     {
         string? outputPath = null;

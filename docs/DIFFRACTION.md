@@ -25,8 +25,11 @@ The engine is ported from [DiscDiffractStudio](https://github.com/Neo-626/DiscDi
   from DiscDiffractStudio's table (`string_carriers.json`); periods it has not synthesised are refused.
 - In the app, DVD projects have a **Grayscale | Color** switch on the Design page (above the tone panel) and
   on the Export page. Color writes the design composite as one whole-disc colour picture for Export and
-  Burn, placed exactly where the grayscale picture would be. The tone preview and the live preview show the
-  colours as encoded (both live-preview modes, since an ISO has no colour read-back yet). Dithering,
+  Burn, placed exactly where the grayscale picture would be. The tone preview and the design projection
+  show the colours as encoded. Output read-back decodes a colour ISO from its bytes: every turn of the
+  spiral carries one colour in a fixed cycle, so the share of grating bytes (not 0xA5) per colour in each
+  pixel, over that colour's gain, gives its level. The read-back has its own Grayscale | Color switch, set
+  from the ISO's sidecar (format `dvd-diffraction-colour-v1`) and adjustable for ISOs without one. Dithering,
   brightness and sRGB linearization are hidden, DVD compatibility does not apply, and a colour disc cannot
   hold files yet. The ISO holds raw sectors without a file system.
 - Other effects (flips, stereo, spot colour) are command line only.

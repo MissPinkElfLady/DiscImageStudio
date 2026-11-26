@@ -136,6 +136,138 @@ public static class DiffractionColorDisc
         RasterCodec.SavePng(full, size, size, pixels, grayscale: false);
     }
 
+    /// <summary>Format tag of the sidecar the app writes next to a colour ISO.</summary>
+    public const string SidecarFormat = "dvd-diffraction-colour-v1";
+
+    /// <summary>True when the ISO's sidecar says it holds a colour picture; null when there is no readable sidecar.</summary>
+    public static bool? IsColorIso(string isoPath)
+    {
+        string path = isoPath + ".json";
+        if (!File.Exists(path)) return null;
+        try
+        {
+            using System.Text.Json.JsonDocument document = System.Text.Json.JsonDocument.Parse(File.ReadAllText(path));
+            return document.RootElement.ValueKind == System.Text.Json.JsonValueKind.Object
+                && document.RootElement.TryGetProperty("format", out System.Text.Json.JsonElement format)
+                && format.ValueKind == System.Text.Json.JsonValueKind.String
+                && format.GetString() == SidecarFormat;
+        }
+        catch (Exception exception) when (exception is IOException or UnauthorizedAccessException
+            or System.Text.Json.JsonException)
+        {
+            return null;
+        }
+    }
+
+    /// <summary>
+    /// Decodes a colour ISO back into a picture. Every turn of the spiral belongs to one colour (red, green or blue,
+    /// in the fixed white-balance cycle), and a colour's brightness in a cell is the share of its turns there that
+    /// carry its grating instead of the 0xA5 filler. So each payload byte is placed on the disc, its turn tells the
+    /// colour, and lit / all bytes of that colour per pixel, over the colour's gain, is the linear level.
+    /// Assumes the app's layout: start angle 0, data clockwise, one whole-disc picture.
+    /// </summary>
+    public static void RenderReadback(string isoPath, string outputPath, IsoReadbackOptions options,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(isoPath);
+        ArgumentException.ThrowIfNullOrWhiteSpace(outputPath);
+        ArgumentNullException.ThrowIfNull(options);
+        if (!options.Clockwise) throw new ArgumentException("Colour pictures need data running clockwise.", nameof(options));
+        if (options.PreviewSize < 16 || options.SamplesPerSector < 1 || options.FillSectors < DvdEccBlockEncoder.SectorCount)
+            throw new ArgumentOutOfRangeException(nameof(options), "The preview size, samples and sectors must be positive.");
+        string iso = Path.GetFullPath(isoPath);
+        long isoSectors = new FileInfo(iso).Length / DvdEccBlockEncoder.PayloadBytesPerSector;
+        if ((ulong)options.StartLba + options.FillSectors > (ulong)isoSectors)
+            throw new ArgumentOutOfRangeException(nameof(options), "The visible sector range exceeds the ISO image contents.");
+        double bitMm = options.ChannelBitLengthNm * 1e-6;
+        DvdTrackGeometry geometry = DvdTrackGeometry.Create(options.InnerRadiusMm, options.OuterRadiusMm,
+            options.TotalSectors * (double)DvdEccBlockEncoder.ChannelBitsPerSector * bitMm,
+            options.PitchLinear, options.PitchQuadratic, options.PitchCubic);
+        // The turn cycle and gains depend only on the carriers, not on the picture: a one-cell stand-in has them.
+        double[,] one = { { 1.0, 1.0 }, { 1.0, 1.0 } };
+        DiffractionPicture reference = DiffractionColor.Build("colour", (0.0, 0.0), (60.0, 60.0), one, one, one,
+            cellMm: 30.0, wide: true);
+        int views = reference.ViewCount;
+        double[] lit = new double[views];
+        for (int v = 0; v < views; v++)
+        {
+            CarrierGroup g = reference.Carriers[v].Group!;
+            StringCarrier nominal = g.Strings[g.Nominal];
+            lit[v] = nominal.Data.Count(b => b != StringCarrier.Filler) / (double)nominal.Data.Length;
+        }
+
+        const double ThetaRef = -Math.PI / 2; // start angle 0 (see BuildLayout)
+        int size = options.PreviewSize, pixelsCount = size * size;
+        int[][] onCount = [.. Enumerable.Range(0, 3).Select(_ => new int[pixelsCount])];
+        int[][] allCount = [.. Enumerable.Range(0, 3).Select(_ => new int[pixelsCount])];
+        double centre = (size - 1) / 2.0;
+        double previewRadius = options.PreviewOuterRadiusMm ?? options.OuterRadiusMm;
+        int samples = options.SamplesPerSector;
+        double byteStep = (double)DvdEccBlockEncoder.PayloadBytesPerSector / samples;
+        int totalBlocks = (int)(options.FillSectors / DvdEccBlockEncoder.SectorCount);
+        int workers = Math.Max(1, Math.Min(Environment.ProcessorCount, totalBlocks));
+        Parallel.For(0, workers, new ParallelOptions { CancellationToken = cancellationToken }, worker =>
+        {
+            byte[] block = new byte[DvdEccBlockEncoder.PayloadBytesPerBlock];
+            using FileStream stream = new(iso, FileMode.Open, FileAccess.Read, FileShare.Read, block.Length,
+                FileOptions.SequentialScan);
+            for (int b = worker; b < totalBlocks; b += workers)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                uint lba0 = options.StartLba + (uint)b * DvdEccBlockEncoder.SectorCount;
+                stream.Seek((long)lba0 * DvdEccBlockEncoder.PayloadBytesPerSector, SeekOrigin.Begin);
+                stream.ReadExactly(block);
+                for (int sector = 0; sector < DvdEccBlockEncoder.SectorCount; sector++)
+                {
+                    ReadOnlySpan<byte> mask = DvdDataFrameBuilder.PayloadScramblerMask(lba0 + (uint)sector + options.PsnOffset);
+                    int baseIndex = sector * DvdEccBlockEncoder.PayloadBytesPerSector;
+                    for (int s = 0; s < samples; s++)
+                    {
+                        int index = Math.Min((int)((s + 0.5) * byteStep), DvdEccBlockEncoder.PayloadBytesPerSector - 1);
+                        bool on = (byte)(block[baseIndex + index] ^ mask[index]) != StringCarrier.Filler;
+                        long bit = (long)lba0 * DvdEccBlockEncoder.ChannelBitsPerSector
+                            + DvdEccBlockEncoder.PayloadDirectChannelOffset(baseIndex + index) + 8;
+                        (double r, double theta) = geometry.AtArcLengthFast(bit * bitMm);
+                        int channel = reference.ViewOfTurn(reference.TurnIndex(theta, ThetaRef)) % 3;
+                        double pr = centre * r / previewRadius;
+                        int px = (int)Math.Round(centre + pr * Math.Cos(-theta));
+                        int py = (int)Math.Round(centre - pr * Math.Sin(-theta));
+                        if ((uint)px >= (uint)size || (uint)py >= (uint)size) continue;
+                        int o = py * size + px;
+                        Interlocked.Increment(ref allCount[channel][o]);
+                        if (on) Interlocked.Increment(ref onCount[channel][o]);
+                    }
+                }
+            }
+        });
+
+        cancellationToken.ThrowIfCancellationRequested();
+        byte[] pixels = new byte[pixelsCount * 4];
+        Parallel.For(0, size, new ParallelOptions { CancellationToken = cancellationToken }, py =>
+        {
+            for (int px = 0; px < size; px++)
+            {
+                int o = py * size + px;
+                bool any = false;
+                for (int c = 0; c < 3; c++)
+                {
+                    int all = allCount[c][o];
+                    if (all == 0) continue;
+                    any = true;
+                    double level = onCount[c][o] / (double)all / lit[c];
+                    double gain = reference.Gains[c];
+                    pixels[o * 4 + 2 - c] = (byte)EncodeSrgb(gain > 0 ? level / gain : 0);
+                }
+
+                if (any) pixels[o * 4 + 3] = 255;
+            }
+        });
+
+        string full = Path.GetFullPath(outputPath);
+        if (Path.GetDirectoryName(full) is string directory) Directory.CreateDirectory(directory);
+        RasterCodec.SavePng(full, size, size, pixels, grayscale: false);
+    }
+
     private static int EncodeSrgb(double linear)
     {
         linear = Math.Clamp(linear, 0.0, 1.0);

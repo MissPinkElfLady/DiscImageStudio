@@ -79,5 +79,32 @@
     "tr": "Güncellendi · Renkli resim · CW · {0} px · sektör başına {1} örnek",
     "es": "Actualizado · Imagen en color · CW · {0} px · {1} muestras por sector",
     "cs": "Aktualizováno · Barevný obraz · CW · {0} px · {1} vzorků na sektor"
+  },
+  "DvdColor.ReadbackReady": {
+    "zh-CN": "已实时更新 · 彩色读回 · CW · {0} px · 每扇区 {1} 个采样",
+    "en": "Updated · Color read-back · CW · {0} px · {1} samples per sector",
+    "zh-TW": "已即時更新 · 彩色讀回 · CW · {0} px · 每磁區 {1} 個取樣",
+    "ja": "更新済み · カラー読み戻し · CW · {0} px · セクターあたり {1} サンプル",
+    "tr": "Güncellendi · Renkli geri okuma · CW · {0} px · sektör başına {1} örnek",
+    "es": "Actualizado · Relectura en color · CW · {0} px · {1} muestras por sector",
+    "cs": "Aktualizováno · Barevné zpětné čtení · CW · {0} px · {1} vzorků na sektor"
+  },
+  "DvdColor.ReadbackLabel": {
+    "zh-CN": "ISO 图像类型",
+    "en": "ISO picture type",
+    "zh-TW": "ISO 影像類型",
+    "ja": "ISO の画像タイプ",
+    "tr": "ISO resim türü",
+    "es": "Tipo de imagen de la ISO",
+    "cs": "Typ obrazu v ISO"
+  },
+  "DvdColor.ReadbackHint": {
+    "zh-CN": "由本应用生成的 ISO 会自动识别；其他来源的 ISO 请手动选择。",
+    "en": "Detected automatically for ISOs made by this app; choose it yourself for others.",
+    "zh-TW": "由本應用程式產生的 ISO 會自動識別；其他來源的 ISO 請手動選擇。",
+    "ja": "このアプリで作成した ISO は自動で判別します。それ以外は手動で選んでください。",
+    "tr": "Bu uygulamanın oluşturduğu ISO'larda otomatik algılanır; diğerleri için kendiniz seçin.",
+    "es": "Se detecta automáticamente en las ISO creadas con esta aplicación; para otras, elígelo tú.",
+    "cs": "U ISO vytvořených touto aplikací se rozpozná automaticky, u ostatních ho vyberte sami."
   }
 }
