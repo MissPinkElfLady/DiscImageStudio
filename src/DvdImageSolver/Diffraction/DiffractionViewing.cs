@@ -108,6 +108,16 @@ internal static class DiffractionViewing
         return [Interp(a, UGrid, table[0]), Interp(a, UGrid, table[1]), Interp(a, UGrid, table[2])];
     }
 
+    private static readonly System.Runtime.CompilerServices.ConditionalWeakTable<StringCarrier, double[][]> Tables = new();
+
+    /// <summary><see cref="SignalXyz(IReadOnlyList{ValueTuple{double, double}}, double)"/> for a carrier string, its table kept.</summary>
+    internal static double[] SignalXyz(StringCarrier carrier, double u)
+    {
+        double[][] table = Tables.GetValue(carrier, c => SignalTable(c.Lines));
+        double a = Math.Abs(u);
+        return [Interp(a, UGrid, table[0]), Interp(a, UGrid, table[1]), Interp(a, UGrid, table[2])];
+    }
+
     private static double[][] SignalTable(IReadOnlyList<(double PeriodBits, double Amplitude)> lines)
     {
         double[][] xyz = [new double[UCount], new double[UCount], new double[UCount]];

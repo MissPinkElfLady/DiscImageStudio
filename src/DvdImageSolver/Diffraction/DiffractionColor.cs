@@ -50,7 +50,7 @@ internal static class DiffractionColor
     /// </summary>
     internal static DiffractionPicture Build(string name, (double X, double Y) centreMm, (double W, double H) sizeMm,
         double[,] red, double[,] green, double[,] blue, int copies = 1, int quarterTurns = 0, double cellMm = 0.05,
-        double brightness = 1.0)
+        double brightness = 1.0, bool wide = false, bool lampTop = true)
     {
         if (copies is not (1 or 2))
             throw new ArgumentOutOfRangeException(nameof(copies),
@@ -60,12 +60,22 @@ internal static class DiffractionColor
         (double x, double y) = centreMm;
         for (int k = 0; k < q; k++) (x, y) = (y, -x);
         (double W, double H) drawnSize = q % 2 == 1 ? (sizeMm.H, sizeMm.W) : sizeMm;
-        int slot = NearestSlot((x, y));
-        if (slot is 12 or 6)
-            throw new ArgumentException(
-                $"Picture {name}: a colour picture is seen by tilting the disc, so its tracks must run up and down through it. " +
-                "Put it at 3 or 9 o'clock, or give it a quarter turn.");
-        var place = new Place((x, y), drawnSize, cellMm, SlotCentre(slot));
+        Place place;
+        if (wide)
+        {
+            place = new Place((x, y), drawnSize, cellMm, SlotCentre(3));
+        }
+        else
+        {
+            int slot = NearestSlot((x, y));
+            if (lampTop ? slot is 12 or 6 : slot is 3 or 9)
+                throw new ArgumentException(lampTop
+                    ? $"Picture {name}: with the lamp above, a colour picture is seen by tilting the disc, so its tracks must " +
+                      "run up and down through it. Put it at 3 or 9 o'clock, give it a quarter turn, or use \"lamp\": \"side\"."
+                    : $"Picture {name}: with the lamp to the side, a colour picture is seen by turning the disc, so its tracks " +
+                      "must run left and right through it. Put it at 12 or 6 o'clock, or give it a quarter turn.");
+            place = new Place((x, y), drawnSize, cellMm, SlotCentre(slot));
+        }
 
         (double[] periods, double[] uTrio) = Plan();
         List<((int, int, int), double)> eyes = [((0, 1, 2), uTrio[0])];
@@ -80,14 +90,17 @@ internal static class DiffractionColor
         for (int k = 0; k < n; k++) gains[k] = gains[k] / most * brightness;
 
         List<DiffractionCarrier> carriers = [];
-        for (int k = 0; k < n; k++)
-        {
-            var (eye, lamp) = DiffractionViewing.Cyclopean(place.Aim, uTrio[k / 3], lampTop: true);
-            carriers.Add(Chirped(periods[k], StretchMap(place, eye, lamp)).Rotated(q));
-        }
-
         double[][,] channels = [red, green, blue];
         List<double[,]> views = [.. Enumerable.Range(0, n).Select(k => Clip(channels[k % 3]))];
+        for (int k = 0; k < n; k++)
+        {
+            // Wide: every cell is tuned for the light direction that suits it best (its tracks across the line from
+            // the lamp), which by symmetry depends only on its distance from the hub.
+            var (eye, lamp) = DiffractionViewing.Cyclopean(place.Aim, uTrio[k / 3], lampTop: wide || lampTop);
+            double[,] stretch = wide ? RadialStretchMap(place, eye, lamp) : StretchMap(place, eye, lamp);
+            carriers.Add(Chirped(periods[k], stretch).Rotated(q));
+        }
+
         return new DiffractionPicture(name, centreMm, sizeMm, views, carriers, linear: true, gains, turns, q, cellMm,
             StringCarrier.Filler);
     }
@@ -96,6 +109,32 @@ internal static class DiffractionColor
     {
         internal int Nx => (int)Math.Round(Size.W / Cell, MidpointRounding.ToEven);
         internal int Ny => (int)Math.Round(Size.H / Cell, MidpointRounding.ToEven);
+    }
+
+    /// <summary>
+    /// Period factor per cell for a wide picture: what the cell needs to show the aim point's colour when the eye and
+    /// lamp are turned about the hub until the cell lies where the aim lies (3 o'clock for a lamp above). That pose
+    /// sees the cell at the same distance from the hub on the aim's axis, so the factor depends only on the radius.
+    /// </summary>
+    internal static double[,] RadialStretchMap(Place place, DiffractionViewing.Vec3 eye, DiffractionViewing.Vec3 lamp)
+    {
+        double atAim = Math.Abs(DiffractionViewing.TangentialU(place.Aim.X, place.Aim.Y, eye, lamp));
+        double aimR = Math.Sqrt(place.Aim.X * place.Aim.X + place.Aim.Y * place.Aim.Y);
+        (double ax, double ay) = (place.Aim.X / aimR, place.Aim.Y / aimR);
+        double[,] s = new double[place.Ny, place.Nx];
+        for (int j = 0; j < place.Ny; j++)
+        {
+            double y = place.Centre.Y + place.Size.H / 2 - (j + 0.5) * place.Cell;
+            for (int i = 0; i < place.Nx; i++)
+            {
+                double x = place.Centre.X - place.Size.W / 2 + (i + 0.5) * place.Cell;
+                double r = Math.Sqrt(x * x + y * y);
+                double v = atAim / Math.Abs(DiffractionViewing.TangentialU(r * ax, r * ay, eye, lamp));
+                s[j, i] = double.IsNaN(v) ? double.PositiveInfinity : v;
+            }
+        }
+
+        return s;
     }
 
     /// <summary>
@@ -154,10 +193,16 @@ internal static class DiffractionColor
         return new CarrierGroup(variants, map, -lo);
     }
 
-    /// <summary>Period of the variant k steps of 0.5% from a carrier's nominal period.</summary>
+    /// <summary>
+    /// Period of the variant k steps of 0.5% from a carrier's nominal period: its own step up to 16 steps out, a
+    /// period of the shared grid beyond that.
+    /// </summary>
     internal static double VariantPeriod(double periodBits, int k)
     {
-        if (Math.Abs(k) <= OwnSteps) return periodBits * Math.Pow(ChirpStep, k);
+        // DiscDiffractStudio's table holds the shared grid in full, but only the own steps its placements asked for;
+        // a missing own step takes the nearest grid period, at most 0.25 % away.
+        double own = periodBits * Math.Pow(ChirpStep, k);
+        if (Math.Abs(k) <= OwnSteps && StringCarrierTable.Contains(own)) return own;
         int j = (int)Math.Round(Math.Log(periodBits * Math.Pow(ChirpStep, k) / PeriodWritableMin) / Math.Log(ChirpStep),
             MidpointRounding.ToEven);
         return PeriodWritableMin * Math.Pow(ChirpStep, Math.Clamp(j, 0, GridSize - 1));

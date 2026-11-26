@@ -18,17 +18,24 @@ The engine is ported from [DiscDiffractStudio](https://github.com/Neo-626/DiscDi
   compensation and white balance. Its colours are right near one tilt (`"copies": 1`, brightest) or two
   tilts (`"copies": 2`, the same picture written twice, each copy dimmer). A third copy would need
   gratings shorter than the 6.4T that can be written.
+- `"coverage": "wide"` writes one colour picture over the whole disc. A lamp shows it in two opposite
+  wedges; moving the lamp round the disc (or turning the disc) shows the rest (see
+  [Whole-disc colour](#whole-disc-colour)).
 - Multi-frame animation and viewing distances other than 50 cm are not ported yet. Carrier strings come
   from DiscDiffractStudio's table (`string_carriers.json`); periods it has not synthesised are refused.
 - Command line only; no Design-workspace integration yet. The ISO holds raw sectors without a file system.
-- No diffraction preview yet.
+- `--preview disc.png` draws the design; with `--preview-light DEGREES` it simulates what the eye sees with
+  the lamp at that many degrees clockwise from 12 o'clock.
 
 ## Usage
 
 ```
-DvdImageSolver diffract --layout layout.json --iso-output image.iso
-disc-image-studio diffract --layout layout.json --iso-output image.iso
+DvdImageSolver diffract --layout layout.json --iso-output image.iso [--preview disc.png]
+disc-image-studio diffract --layout layout.json --iso-output image.iso [--preview disc.png]
 ```
+
+`--preview` alone writes only the PNG, which takes seconds. Add `--preview-light 0` (lamp above),
+`--preview-light 90` (lamp to the right) and so on to see the disc under a lamp.
 
 A layout names the calibration and the pictures; see
 [examples/diffraction/flip-layout.json](examples/diffraction/flip-layout.json) and the comments in
@@ -40,7 +47,11 @@ A layout names the calibration and the pictures; see
   `color` (one colour image, with `copies` 1 or 2). Or give `carriers` directly, with optional `gains` and
   `turnCounts`. `brightness` scales every view's lit share.
 - A colour picture is seen by tilting, so its tracks must run up and down through it: put it at 3 or 9
-  o'clock, or at 12 / 6 o'clock with a quarter turn.
+  o'clock, or at 12 / 6 o'clock with a quarter turn. With `"lamp": "side"` it is seen by turning instead and
+  goes at 12 or 6 o'clock.
+- `"coverage": "wide"` (colour): one picture over the whole disc, e.g. `"centerMm": [0, 0]`,
+  `"sizeMm": [118, 118]`; see
+  [examples/diffraction/color-wide-layout.json](examples/diffraction/color-wide-layout.json).
 - `quarterTurns`: counter-clockwise quarter turns of the images on the canvas.
 - Images are cut down around their middle to the picture's aspect ratio, averaged onto 0.05 mm cells in
   linear light, and reduced to luminance (grey effects) or kept as red, green and blue (colour). Bright, high-contrast
@@ -76,6 +87,24 @@ so that every cell shows the colour the centre shows, and the turns are shared o
 A grating sends each colour to its own direction, so the colours drift as the disc is tilted away from the
 design tilt. That is physics, not a limitation of the program: a second copy only adds a second tilt
 where the colours are right.
+
+## Whole-disc colour
+
+With one lamp and one viewer, every point of the disc sends light to the eye by its own number
+u = (l + e) · t. The in-plane part of l + e is the gradient of minus (distance to the lamp + distance to the
+eye), so its circulation round any turn of the spiral is zero: on every turn, u is positive on one side,
+negative on the other and zero at two or more points, where the tracks run straight towards the lamp. So no
+pose can light a whole disc at once, which is also why Disc Color Studio's large images are cut off at some
+angles.
+
+`"coverage": "wide"` therefore writes the whole picture and tunes every cell for the lamp direction that
+suits it best: the one that puts the cell's tracks across the line from the lamp, as for a picture at 3
+o'clock with the lamp above. By symmetry about the hub that pose sees every cell like a cell at the same
+radius on the 3 o'clock axis, so the periods depend only on the radius (with the eye 50 cm in front of the
+hub they barely change at all). Under one lamp the picture shows in its own colours along the line through
+the hub across the lamp direction and fades through shifted colours to dark within a few tens of degrees on
+either side: two opposite wedges. Moving the lamp round the disc, or turning the disc, sweeps the wedges
+round and shows the rest of the picture. `--preview-light` simulates this with the white-balance model.
 
 ## Parity with DiscDiffractStudio
 

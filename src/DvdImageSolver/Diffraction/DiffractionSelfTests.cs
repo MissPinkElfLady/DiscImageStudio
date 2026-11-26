@@ -67,6 +67,7 @@ internal static class DiffractionSelfTests
         TestStringRuns();
         TestColor("colour, two copies", TwoCopies, 2);
         TestColor("colour, one copy", OneCopy, 1);
+        TestWideColor();
     }
 
     // make_color_vectors.py (--copies 2 and --copies 1): DiscDiffractStudio's colour flip of the channels below
@@ -197,6 +198,70 @@ internal static class DiffractionSelfTests
         }
 
         Check(mismatches == 0, $"{what}: parity with DiscDiffractStudio ({mismatches} of {expected.Blocks.Length} blocks differ)");
+    }
+
+    /// <summary>
+    /// A whole-disc colour picture: every cell is written, tuned for the light direction that suits it, so the
+    /// periods depend only on the distance from the hub.
+    /// </summary>
+    private static void TestWideColor()
+    {
+        DvdTrackGeometry geometry = ParityGeometry();
+        const double Cell = 0.5;
+        int n = (int)Math.Round(118.0 / Cell);
+        double[,] white = new double[n, n];
+        for (int j = 0; j < n; j++)
+            for (int i = 0; i < n; i++)
+                white[j, i] = 1.0;
+        foreach (int copies in new[] { 1, 2 })
+        {
+            string what = $"wide colour, {copies} cop{(copies == 1 ? "y" : "ies")}";
+            DiffractionPicture picture = DiffractionColor.Build("wide", (0.0, 0.0), (118.0, 118.0), white, white, white,
+                copies: copies, cellMm: Cell, wide: true);
+            bool allLit = true;
+            for (int j = 0; j < picture.Ny; j++)
+                for (int i = 0; i < picture.Nx; i++)
+                    allLit &= picture.Levels[0][j, i] > 0;
+            Check(allLit, $"{what}: every cell is written");
+            foreach (DiffractionCarrier c in picture.Carriers)
+            {
+                CarrierGroup g = c.Group!;
+                double At(double x, double y)
+                {
+                    picture.TryCell(x, y, out int j, out int i);
+                    return g.Strings[g.Variant![j, i]].PeriodBits;
+                }
+
+                double d = 45.0 / Math.Sqrt(2);
+                Check(At(45, 0) == At(0, 45) && At(0, 45) == At(-45, 0) && Math.Abs(Math.Log(At(-d, -d) / At(45, 0))) < 0.0051,
+                    $"{what}: periods depend only on the radius");
+                Check(g.Strings.All(x => x.PeriodBits is >= 6.4 - 1e-9 and <= 22.0 + 1e-9), $"{what}: periods stay writable");
+            }
+
+            DiffractionLayout layout = new([picture], geometry);
+            byte[] block = new byte[DiffractionLayout.SectorsPerBlock * DiffractionLayout.PayloadBytes];
+            layout.FillBlock(1_000_000u, block);
+            Check(block.Any(x => x != 0), $"{what}: blocks fill");
+        }
+
+        double[,] small = new double[48, 48];
+        Check(!Throws(() => DiffractionColor.Build("x", (0.0, 43.0), (24.0, 24.0), small, small, small, cellMm: Cell, lampTop: false)),
+            "a colour picture at 12 o'clock is fine with the lamp to the side");
+        Check(Throws(() => DiffractionColor.Build("x", (0.0, 43.0), (24.0, 24.0), small, small, small, cellMm: Cell)),
+            "a colour picture at 12 o'clock is refused with the lamp above");
+    }
+
+    private static bool Throws(Action action)
+    {
+        try
+        {
+            action();
+            return false;
+        }
+        catch (ArgumentException)
+        {
+            return true;
+        }
     }
 
     private static void TestStringRuns()

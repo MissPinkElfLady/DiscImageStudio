@@ -100,10 +100,23 @@ internal static class StringCarrierTable
     /// differences of pow() between platforms find the same string.
     /// </summary>
     internal static StringCarrier Get(double periodBits)
+        => TryFind(periodBits, out StringCarrier? found) ? found : throw new InvalidOperationException(
+            $"No carrier string for a period of {periodBits.ToString("R", CultureInfo.InvariantCulture)}T in the table " +
+            "(this picture asks for a grating period DiscDiffractStudio has not synthesised).");
+
+    /// <summary>Whether the table holds a string for this period (see <see cref="Get"/>).</summary>
+    internal static bool Contains(double periodBits) => TryFind(periodBits, out _);
+
+    private static bool TryFind(double periodBits, [System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out StringCarrier? found)
     {
         var (periods, strings) = Table.Value;
         int index = Array.BinarySearch(periods, periodBits);
-        if (index >= 0) return strings[index];
+        if (index >= 0)
+        {
+            found = strings[index];
+            return true;
+        }
+
         int above = ~index;
         int best = -1;
         double bestError = double.PositiveInfinity;
@@ -114,11 +127,8 @@ internal static class StringCarrierTable
             if (error < bestError) (best, bestError) = (k, error);
         }
 
-        if (best < 0 || bestError > 1e-11)
-            throw new InvalidOperationException(
-                $"No carrier string for a period of {periodBits.ToString("R", CultureInfo.InvariantCulture)}T in the table " +
-                "(this picture asks for a grating period DiscDiffractStudio has not synthesised).");
-        return strings[best];
+        found = best >= 0 && bestError <= 1e-11 ? strings[best] : null;
+        return found is not null;
     }
 
     private static (double[], StringCarrier[]) Load()

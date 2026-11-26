@@ -4,6 +4,7 @@
 
 ### 中文
 
+- 彩色衍射图新增整盘模式（`"coverage": "wide"`）：一张彩色图写满整张光盘，每处都按最适合它的灯光方向调谐；一盏灯下显示为过中心的两条相对扇形，移动灯光或转动光盘即可看到其余部分。`"lamp": "side"` 允许把普通彩色图放在 12 点或 6 点。`diffract` 新增 `--preview` 与 `--preview-light`，输出设计图或模拟某一灯光方向下的效果。
 - 衍射图像新增单张彩色图（`"effect": "color"`）：红、绿、蓝三个通道各用一条 91 字节载波串写入，含逐格周期补偿与白平衡，俯仰到设计角度时显示彩色；`"copies": 2` 在第二个俯仰角再写一份。输出与 DiscDiffractStudio 的彩色两帧切换逐字节一致。
 - 新增实验性 DVD 衍射图像引擎（`diffract` 命令）：从 [DiscDiffractStudio](https://github.com/Neo-626/DiscDiffractStudio)（GPL-3.0-or-later）移植单字节载波、逐圈分配与桥接字节，可写入单张图、两帧切换与立体图；输出与 DiscDiffractStudio 逐字节一致（见 [DIFFRACTION.md](docs/DIFFRACTION.md)）。仅限 DVD-R，尚无图形界面。
 - 新增铼德 Excellent X DVD+RW 4× 内置预设（MID `RITEK-004-48`，圈码 `VW47H-01062`）：内半径 23.941751 mm、外半径 58.143818 mm、2,295,104 扇区，三项轨距系数取自[讨论 #191](https://github.com/JiaFeiMiao-K-Cat/DiscImageStudio/discussions/191)。该盘片已完成一次整盘 DVD+RW 覆写刻录。
@@ -21,6 +22,7 @@
 
 ### English
 
+- Colour diffraction pictures can now cover the whole disc (`"coverage": "wide"`): the picture is written everywhere, each part tuned for the light direction that suits it, so one lamp shows two opposite wedges across the hub and moving the lamp or turning the disc shows the rest. `"lamp": "side"` allows spot colour pictures at 12 or 6 o'clock. `diffract` has new `--preview` and `--preview-light` options that draw the design or simulate the disc under a lamp.
 - Diffraction pictures can now be one colour image (`"effect": "color"`): the red, green and blue channels are written on three 91-byte carrier strings with per-cell period compensation and white balance, and show in colour at the design tilt; `"copies": 2` writes the picture again for a second tilt. The output matches DiscDiffractStudio's colour flip byte for byte.
 - Added an experimental DVD diffraction engine (`diffract` command), ported from [DiscDiffractStudio](https://github.com/Neo-626/DiscDiffractStudio) (GPL-3.0-or-later): single-byte carriers, turn-by-turn sharing and bridge bytes, for single pictures, two-frame flips and stereo pairs. Its output matches DiscDiffractStudio byte for byte (see [DIFFRACTION.md](docs/DIFFRACTION.md)). DVD-R only, no GUI yet.
 - Added a built-in preset for the RiTEK Excellent X DVD+RW 4× (MID `RITEK-004-48`, ring code `VW47H-01062`): inner radius 23.941751 mm, outer radius 58.143818 mm, 2,295,104 sectors, with the three track-pitch coefficients contributed in [Discussion #191](https://github.com/JiaFeiMiao-K-Cat/DiscImageStudio/discussions/191). The same disc completed one full-disc DVD+RW overwrite burn.

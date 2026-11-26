@@ -1341,8 +1341,20 @@ internal static class Program
     private static int Diffract(CliArguments arguments)
     {
         string layoutPath = arguments.Require("layout");
-        string isoPath = arguments.Require("iso-output");
+        string? isoPath = arguments.Has("iso-output") ? arguments.Require("iso-output") : null;
+        string? previewPath = arguments.Has("preview") ? arguments.Require("preview") : null;
+        if (isoPath is null && previewPath is null) throw new ArgumentException("Specify --iso-output, --preview, or both.");
         var loaded = Diffraction.DiffractionProject.Load(layoutPath);
+        if (previewPath is not null)
+        {
+            double? light = arguments.Has("preview-light")
+                ? double.Parse(arguments.Require("preview-light"), System.Globalization.CultureInfo.InvariantCulture)
+                : null;
+            Diffraction.DiffractionProject.WritePreview(loaded, previewPath, light);
+            Console.WriteLine($"Wrote preview {previewPath}.");
+        }
+
+        if (isoPath is null) return 0;
         uint sectors = arguments.Has("sectors")
             ? arguments.GetUInt("sectors", 0)
             : loaded.Layout.LastSector(loaded.TotalSectors);
@@ -1392,8 +1404,9 @@ internal static class Program
                 (--output payload.bin | --iso-output image.iso) [options]
 
             Write diffraction pictures (DVD-R; see Diffraction/DiffractionProject.cs for the layout file):
-              DvdImageSolver diffract --layout layout.json --iso-output image.iso
-                [--sectors N] [--psn-offset 0x30000] [--parallelism 0]
+              DvdImageSolver diffract --layout layout.json [--iso-output image.iso] [--preview disc.png]
+                [--preview-light DEGREES] [--sectors N] [--psn-offset 0x30000] [--parallelism 0]
+                (--preview-light: simulate a lamp at that many degrees clockwise from 12 o'clock)
 
             Encode one 32768-byte payload block:
               DvdImageSolver encode --input payload.bin --output channel.bin [options]

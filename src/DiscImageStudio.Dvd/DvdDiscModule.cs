@@ -60,11 +60,13 @@ public sealed class DvdDiscModule : IOpticalDiscModule
             new DiscCommandDescriptor(
                 "diffract",
                 "Generate DVD diffraction image (experimental)",
-                "Writes angle-dependent diffraction pictures (single, flip, stereo) from a layout file; DVD-R only.",
+                "Writes angle-dependent diffraction pictures (single, flip, stereo, colour) from a layout file; DVD-R only.",
                 DiscModuleCapabilities.DataImageGeneration | DiscModuleCapabilities.ErrorCorrectionEncoding,
                 [
                     new("layout", "Diffraction layout (JSON)", DiscOptionValueType.InputFile, Required: true),
-                    new("iso-output", "Output ISO", DiscOptionValueType.OutputFile, Required: true),
+                    new("iso-output", "Output ISO", DiscOptionValueType.OutputFile, Required: false),
+                    new("preview", "Preview PNG of the design", DiscOptionValueType.OutputFile, Required: false),
+                    new("preview-light", "Simulate a lamp at this many degrees clockwise from 12 o'clock", DiscOptionValueType.Decimal, Required: false),
                 ]),
             new DiscCommandDescriptor(
                 "selftest",
