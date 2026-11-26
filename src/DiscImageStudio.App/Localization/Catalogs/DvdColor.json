@@ -1,0 +1,110 @@
+{
+  "DvdColor.Label": {
+    "zh-CN": "DVD 图像模式",
+    "en": "DVD picture mode",
+    "zh-TW": "DVD 影像模式",
+    "ja": "DVD の画像モード",
+    "tr": "DVD resim modu",
+    "es": "Modo de imagen del DVD",
+    "cs": "Režim obrazu DVD"
+  },
+  "DvdColor.Greyscale": {
+    "zh-CN": "灰度",
+    "en": "Grayscale",
+    "zh-TW": "灰階",
+    "ja": "グレースケール",
+    "tr": "Gri tonlamalı",
+    "es": "Escala de grises",
+    "cs": "Odstíny šedi"
+  },
+  "DvdColor.Colour": {
+    "zh-CN": "彩色",
+    "en": "Color",
+    "zh-TW": "彩色",
+    "ja": "カラー",
+    "tr": "Renkli",
+    "es": "Color",
+    "cs": "Barevně"
+  },
+  "DvdColor.Hint": {
+    "zh-CN": "以衍射光栅把设计写满整张盘：在一盏灯下可看到两个相对的扇形，移动灯或转动盘片即可看到整幅图。DVD 兼容性对彩色无效，暂不能加入文件。",
+    "en": "Writes the design over the whole disc as diffraction gratings. Under one lamp you see two opposite wedges; move the lamp or turn the disc to see the rest. DVD compatibility does not apply, and files cannot be added yet.",
+    "zh-TW": "以繞射光柵把設計寫滿整張光碟：在一盞燈下可看到兩個相對的扇形，移動燈或轉動光碟即可看到整幅圖。DVD 相容性對彩色無效，暫不能加入檔案。",
+    "ja": "デザインを回折格子としてディスク全体に書き込みます。1 つの照明では向かい合う 2 つの扇形が見え、照明を動かすかディスクを回すと残りが見えます。DVD 互換性は適用されず、ファイルはまだ追加できません。",
+    "tr": "Tasarımı kırınım ağları olarak tüm diske yazar. Tek bir lambanın altında karşılıklı iki dilim görünür; gerisini görmek için lambayı hareket ettirin ya da diski döndürün. DVD uyumluluğu uygulanmaz; henüz dosya eklenemez.",
+    "es": "Escribe el diseño en todo el disco como redes de difracción. Bajo una lámpara se ven dos cuñas opuestas; mueve la lámpara o gira el disco para ver el resto. La compatibilidad de DVD no se aplica y aún no se pueden añadir archivos.",
+    "cs": "Zapíše návrh na celý disk jako difrakční mřížky. Pod jednou lampou jsou vidět dvě protilehlé výseče; zbytek uvidíte, když lampou pohnete nebo disk otočíte. Kompatibilita DVD se nepoužije a soubory zatím nelze přidat."
+  },
+  "DvdColor.NoFiles": {
+    "zh-CN": "彩色 DVD 暂不能加入文件。请清空设计页的文件夹，或改用灰度。",
+    "en": "Color DVDs cannot include files yet. Clear the folder on the Design page, or switch to grayscale.",
+    "zh-TW": "彩色 DVD 暫不能加入檔案。請清空設計頁的資料夾，或改用灰階。",
+    "ja": "カラーの DVD にはまだファイルを追加できません。デザインページのフォルダーを空にするか、グレースケールに切り替えてください。",
+    "tr": "Renkli DVD'lere henüz dosya eklenemez. Tasarım sayfasındaki klasörü temizleyin ya da gri tonlamaya geçin.",
+    "es": "Los DVD en color aún no pueden incluir archivos. Vacía la carpeta en la página Diseño o cambia a escala de grises.",
+    "cs": "Barevná DVD zatím nemohou obsahovat soubory. Vymažte složku na stránce Návrh, nebo přepněte na odstíny šedi."
+  },
+  "DvdColor.Generating": {
+    "zh-CN": "正在生成彩色 DVD ISO…",
+    "en": "Generating color DVD ISO…",
+    "zh-TW": "正在產生彩色 DVD ISO…",
+    "ja": "カラー DVD ISO を生成しています…",
+    "tr": "Renkli DVD ISO oluşturuluyor…",
+    "es": "Generando la ISO de DVD en color…",
+    "cs": "Vytváří se barevné ISO DVD…"
+  },
+  "DvdColor.BurnContent": {
+    "zh-CN": "彩色 DVD · {0} 扇区 · {1:F1} MiB",
+    "en": "Color DVD · {0} sectors · {1:F1} MiB",
+    "zh-TW": "彩色 DVD · {0} 磁區 · {1:F1} MiB",
+    "ja": "カラー DVD · {0} セクター · {1:F1} MiB",
+    "tr": "Renkli DVD · {0} sektör · {1:F1} MiB",
+    "es": "DVD en color · {0} sectores · {1:F1} MiB",
+    "cs": "Barevné DVD · {0} sektorů · {1:F1} MiB"
+  },
+  "DvdColor.PreviewRefreshing": {
+    "zh-CN": "正在刷新 {0} px DVD 彩色预览…",
+    "en": "Refreshing {0} px DVD color preview…",
+    "zh-TW": "正在重新整理 {0} px DVD 彩色預覽…",
+    "ja": "{0} px の DVD カラープレビューを更新しています…",
+    "tr": "{0} px DVD renkli önizlemesi yenileniyor…",
+    "es": "Actualizando la vista previa en color del DVD de {0} px…",
+    "cs": "Obnovuje se barevný náhled DVD {0} px…"
+  },
+  "DvdColor.PreviewReady": {
+    "zh-CN": "已实时更新 · 彩色图 · CW · {0} px · 每扇区 {1} 个采样",
+    "en": "Updated · Color picture · CW · {0} px · {1} samples per sector",
+    "zh-TW": "已即時更新 · 彩色圖 · CW · {0} px · 每磁區 {1} 個取樣",
+    "ja": "更新済み · カラー画像 · CW · {0} px · セクターあたり {1} サンプル",
+    "tr": "Güncellendi · Renkli resim · CW · {0} px · sektör başına {1} örnek",
+    "es": "Actualizado · Imagen en color · CW · {0} px · {1} muestras por sector",
+    "cs": "Aktualizováno · Barevný obraz · CW · {0} px · {1} vzorků na sektor"
+  },
+  "DvdColor.ReadbackReady": {
+    "zh-CN": "已实时更新 · 彩色读回 · CW · {0} px · 每扇区 {1} 个采样",
+    "en": "Updated · Color read-back · CW · {0} px · {1} samples per sector",
+    "zh-TW": "已即時更新 · 彩色讀回 · CW · {0} px · 每磁區 {1} 個取樣",
+    "ja": "更新済み · カラー読み戻し · CW · {0} px · セクターあたり {1} サンプル",
+    "tr": "Güncellendi · Renkli geri okuma · CW · {0} px · sektör başına {1} örnek",
+    "es": "Actualizado · Relectura en color · CW · {0} px · {1} muestras por sector",
+    "cs": "Aktualizováno · Barevné zpětné čtení · CW · {0} px · {1} vzorků na sektor"
+  },
+  "DvdColor.ReadbackLabel": {
+    "zh-CN": "ISO 图像类型",
+    "en": "ISO picture type",
+    "zh-TW": "ISO 影像類型",
+    "ja": "ISO の画像タイプ",
+    "tr": "ISO resim türü",
+    "es": "Tipo de imagen de la ISO",
+    "cs": "Typ obrazu v ISO"
+  },
+  "DvdColor.ReadbackHint": {
+    "zh-CN": "由本应用生成的 ISO 会自动识别；其他来源的 ISO 请手动选择。",
+    "en": "Detected automatically for ISOs made by this app; choose it yourself for others.",
+    "zh-TW": "由本應用程式產生的 ISO 會自動識別；其他來源的 ISO 請手動選擇。",
+    "ja": "このアプリで作成した ISO は自動で判別します。それ以外は手動で選んでください。",
+    "tr": "Bu uygulamanın oluşturduğu ISO'larda otomatik algılanır; diğerleri için kendiniz seçin.",
+    "es": "Se detecta automáticamente en las ISO creadas con esta aplicación; para otras, elígelo tú.",
+    "cs": "U ISO vytvořených touto aplikací se rozpozná automaticky, u ostatních ho vyberte sami."
+  }
+}

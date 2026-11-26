@@ -25,13 +25,13 @@ internal sealed class DiffractionPicture
     /// <param name="centerMm">Centre on the canvas (X right, Y up).</param>
     /// <param name="sizeMm">Width and height before rounding to whole cells.</param>
     /// <param name="views">Grey images [row, column], row 0 at the top, values 0..1.</param>
-    /// <param name="carriers">One scrambled-domain carrier byte per view.</param>
+    /// <param name="carriers">One carrier per view: a scrambled-domain byte or a group of carrier strings.</param>
     /// <param name="linear">True when the views are already linear light; otherwise sRGB-encoded.</param>
     /// <param name="gains">Lit share scale per view (to balance brightness); null for 1.</param>
     /// <param name="turnCounts">Turns of one cycle per view; null for one each.</param>
     /// <param name="quarterTurns">Counter-clockwise quarter turns applied to the views on the canvas.</param>
     internal DiffractionPicture(string name, (double X, double Y) centerMm, (double W, double H) sizeMm,
-        IReadOnlyList<double[,]> views, IReadOnlyList<byte> carriers, bool linear = true,
+        IReadOnlyList<double[,]> views, IReadOnlyList<DiffractionCarrier> carriers, bool linear = true,
         IReadOnlyList<double>? gains = null, IReadOnlyList<int>? turnCounts = null, int quarterTurns = 0,
         double cellMm = 0.05, byte offByte = DiffractionCarriers.OffByte)
     {
@@ -44,6 +44,17 @@ internal sealed class DiffractionPicture
         CellMm = cellMm;
         OffByte = offByte;
         Carriers = [.. carriers];
+        if (Carriers.Any(c => c.Group is not null) && offByte != StringCarrier.Filler)
+            throw new ArgumentException($"Picture {name}: string carriers need 0x{StringCarrier.Filler:X2} as the off byte.");
+        foreach (DiffractionCarrier c in Carriers)
+        {
+            if (c.Group?.Variant is byte[,] map && (map.GetLength(0) != (int)Math.Round(sizeMm.H / cellMm, MidpointRounding.ToEven)
+                || map.GetLength(1) != (int)Math.Round(sizeMm.W / cellMm, MidpointRounding.ToEven)))
+                throw new ArgumentException($"Picture {name}: a variant map needs one entry per cell.");
+        }
+
+        // A string carrier's code is handed out by the layout it is put in.
+        Codes = [.. Carriers.Select(c => c.Byte is byte b ? (int)b : -1)];
         Nx = (int)Math.Round(sizeMm.W / cellMm, MidpointRounding.ToEven);
         Ny = (int)Math.Round(sizeMm.H / cellMm, MidpointRounding.ToEven);
         if (Nx < 1 || Ny < 1) throw new ArgumentException($"Picture {name}: smaller than one cell.");
@@ -83,7 +94,10 @@ internal sealed class DiffractionPicture
     internal int Nx { get; }
     internal int Ny { get; }
     internal byte OffByte { get; }
-    internal byte[] Carriers { get; }
+    internal DiffractionCarrier[] Carriers { get; }
+
+    /// <summary>Code written where view v is lit: the byte, or for a string carrier 256 + 256 g (set by the layout).</summary>
+    internal int[] Codes { get; }
     internal double[] Gains { get; }
     internal int[] TurnCounts { get; }
     internal int ViewCount => Carriers.Length;
@@ -142,8 +156,11 @@ internal sealed class DiffractionPicture
     internal long TurnIndex(double theta, double thetaRef)
         => (long)Math.Floor((theta - thetaRef - Azimuth) / (2 * Math.PI) + 0.5);
 
-    /// <summary>The byte for a payload byte lying in cell (j, i) on spiral turn <paramref name="turn"/>.</summary>
-    internal byte CodeFor(int j, int i, long turn)
+    /// <summary>
+    /// The code for a payload byte lying in cell (j, i) on spiral turn <paramref name="turn"/>: a byte (0..255),
+    /// or 256 + 256 g + w for variant w of string group g.
+    /// </summary>
+    internal int CodeFor(int j, int i, long turn)
     {
         long cycle = _cycle.Length;
         int m = (int)(((turn % cycle) + cycle) % cycle);
@@ -151,7 +168,17 @@ internal sealed class DiffractionPicture
         long k = (long)Math.Floor((double)turn / cycle) * _count[v] + _rank[m];
         int kk = (int)(((k % TurnLevels) + TurnLevels) % TurnLevels);
         bool lit = (double)Levels[v][j, i] + CellDither[j % 4, i % 4] > TurnThreshold[kk];
-        return lit ? Carriers[v] : OffByte;
+        if (!lit) return OffByte;
+        int code = Codes[v];
+        if (code < 0) throw new InvalidOperationException($"Picture {Name} has string carriers: put it in a layout first.");
+        return Carriers[v].Group?.Variant is byte[,] map ? code + map[j, i] : code;
+    }
+
+    /// <summary>The view that turn <paramref name="turn"/> belongs to (see <see cref="CodeFor"/>).</summary>
+    internal int ViewOfTurn(long turn)
+    {
+        long cycle = _cycle.Length;
+        return _cycle[(int)(((turn % cycle) + cycle) % cycle)];
     }
 
     /// <summary>Mean lit share of the view (1 = every cell fully lit for that view).</summary>
@@ -180,11 +207,12 @@ internal sealed class DiffractionPicture
     }
 
     /// <summary>np.rot90(image, k): k counter-clockwise quarter turns.</summary>
-    internal static double[,] Rotate(double[,] image, int k)
+    internal static T[,] Rotate<T>(T[,] image, int k)
     {
+        k = ((k % 4) + 4) % 4;
         if (k == 0) return image;
         int h = image.GetLength(0), w = image.GetLength(1);
-        double[,] output = k == 2 ? new double[h, w] : new double[w, h];
+        T[,] output = k == 2 ? new T[h, w] : new T[w, h];
         for (int r = 0; r < h; r++)
         {
             for (int c = 0; c < w; c++)

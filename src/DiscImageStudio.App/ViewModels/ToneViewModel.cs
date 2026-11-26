@@ -181,6 +181,7 @@ public partial class ToneViewModel : ObservableObject
             or nameof(DiscParametersState.DvdDataDirectory)
             or nameof(DiscParametersState.DvdVolumeLabel)
             or nameof(DiscParametersState.DvdFilesAtOuterRing)
+            or nameof(DiscParametersState.DvdColor)
             or nameof(DiscParametersState.DvdOuterRingBleed))
         {
             ScheduleTonePreview();
@@ -322,6 +323,18 @@ public partial class ToneViewModel : ObservableObject
                     if (plan.HasFileSystem)
                         FileRegionPreviewOverlay.ApplyBluRay(outputPath, parameters,
                             plan.DrawingStartSector, plan.DrawingEndSectorExclusive, cancellationToken);
+                    return 0;
+                });
+            }
+            else if (IsDvd && _state.DvdColor)
+            {
+                DvdStreamingOptions options = ReadDvdPreviewOptions();
+                hasFileRegionOverlay = false;
+                samplesPerSector = TonePreviewDvdSamplesPerSector;
+                await StaWorker.RunAsync(() =>
+                {
+                    DvdTonePreview.RenderColor(sourcePath, outputPath, options, TonePreviewSize,
+                        TonePreviewDvdSamplesPerSector, cancellationToken);
                     return 0;
                 });
             }

@@ -1,5 +1,7 @@
 # Diffraction parity vectors
 
+`make_color_vectors.py --copies 1|2` does the same for the colour effect.
+
 `make_vectors.py` builds the synthetic layout used by `DiffractionSelfTests` with DiscDiffractStudio's
 Python engine and prints the values the C# self-test compares against.
 

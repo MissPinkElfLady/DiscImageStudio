@@ -166,6 +166,21 @@
                                         <controls:GeometrySummary Title="{loc:Text Xaml.ProjectParameters}"
                                             EditCommand="{Binding EditGeometryCommand}" />
 
+                                        <!-- A DVD ISO holds a grayscale or a colour picture; the sidecar says
+                                             which, and this switch covers ISOs without one. -->
+                                        <controls:VisibilityGate IsOpen="{Binding IsDvdSelected}">
+                                            <StackPanel Margin="0,12,0,0">
+                                                <TextBlock Style="{StaticResource FieldLabel}" Margin="0,0,0,6"
+                                                           Text="{loc:Text DvdColor.ReadbackLabel}" />
+                                                <controls:SegmentedControl HorizontalAlignment="Stretch"
+                                                                           LabelA="{loc:Text DvdColor.Greyscale}"
+                                                                           LabelB="{loc:Text DvdColor.Colour}"
+                                                                           IsSecondSelected="{Binding DvdReadbackColor}" />
+                                                <TextBlock Style="{StaticResource CompactHint}" Margin="0,4,0,0"
+                                                           TextWrapping="Wrap" Text="{loc:Text DvdColor.ReadbackHint}" />
+                                            </StackPanel>
+                                        </controls:VisibilityGate>
+
                                         <!-- Generated tracks carry their interleave in the sidecar
                                              metadata and sync the switch themselves; an external
                                              track (another tool, an old build) has none, so the

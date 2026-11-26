@@ -109,6 +109,10 @@ public partial class DiscParametersState : ObservableObject
     [ObservableProperty] private bool _dvdOuterRingBleed;
     [ObservableProperty] private bool _dvdReadCompatibility;
     [ObservableProperty] private string _dvdReadCompatibilityMode = DvdReadCompatibilityModes.Current;
+    /// <summary>Write the DVD design as one colour diffraction picture over the whole disc instead of greyscale.</summary>
+    [ObservableProperty, NotifyPropertyChangedFor(nameof(DvdGreyscale))] private bool _dvdColor;
+
+    public bool DvdGreyscale => !DvdColor;
     [ObservableProperty, NotifyPropertyChangedFor(nameof(DvdPitchSummary), nameof(DvdActualPitchSummary))] private string _dvdTotalSectors = "2295104";
     [ObservableProperty] private string _dvdUsableSectors = string.Empty;
     [ObservableProperty, NotifyPropertyChangedFor(nameof(DvdPitchSummary))] private string _dvdInnerRadius = "24.0";

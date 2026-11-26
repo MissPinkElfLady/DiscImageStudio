@@ -420,7 +420,25 @@
                              through the shared state. -->
                         <Border x:Name="ToneCard" Grid.Row="1" Style="{StaticResource CardStyle}" Padding="14"
                                 Margin="0,16,0,0">
-                            <controls:TonePanel x:Name="ToneRail" DataContext="{Binding Tone}" />
+                            <StackPanel>
+                                <!-- DVD only: greyscale tone or one colour diffraction picture over
+                                     the whole disc. Its height comes off the tone rail's budget. -->
+                                <controls:VisibilityGate x:Name="ColorModeGate" IsOpen="{Binding IsDvd}"
+                                                         SizeChanged="OnPageSizeChanged">
+                                    <StackPanel Margin="0,0,0,14">
+                                        <TextBlock Style="{StaticResource FieldLabel}"
+                                                   Text="{loc:Text DvdColor.Label}" Margin="0,0,0,6" />
+                                        <controls:SegmentedControl LabelA="{loc:Text DvdColor.Greyscale}"
+                                                                   LabelB="{loc:Text DvdColor.Colour}"
+                                                                   IsSecondSelected="{Binding State.DvdColor}" />
+                                        <controls:VisibilityGate IsOpen="{Binding State.DvdColor}">
+                                            <TextBlock Style="{StaticResource HintText}" Margin="0,8,0,0"
+                                                       TextWrapping="Wrap" Text="{loc:Text DvdColor.Hint}" />
+                                        </controls:VisibilityGate>
+                                    </StackPanel>
+                                </controls:VisibilityGate>
+                                <controls:TonePanel x:Name="ToneRail" DataContext="{Binding Tone}" />
+                            </StackPanel>
                         </Border>
                     </Grid>
                 </ScrollViewer>

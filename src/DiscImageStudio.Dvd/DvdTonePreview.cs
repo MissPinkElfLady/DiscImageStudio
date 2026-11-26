@@ -1,3 +1,4 @@
+using DvdImageSolver.Diffraction;
 using DvdImageSolver.Solver;
 
 namespace DiscImageStudio.Dvd;
@@ -53,5 +54,28 @@ public static class DvdTonePreview
             outputPath,
             preview,
             cancellationToken);
+    }
+
+    /// <summary>The colour picture as it will be written, laid out on the generated geometry.</summary>
+    public static void RenderColor(
+        string imagePath,
+        string outputPath,
+        DvdStreamingOptions options,
+        int previewSize,
+        int samplesPerSector,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(options);
+        options.Validate();
+        CalibrationPreviewOptions preview = new(
+            options.TotalSectors, 0, options.OutputSectors,
+            options.InnerRadiusMm, options.OuterRadiusMm, options.InnerRadiusMm, options.OuterRadiusMm,
+            options.ChannelBitLengthNm, Clockwise: true, options.LuminanceThreshold, options.AlphaThreshold,
+            previewSize, samplesPerSector,
+            options.PitchLinear, options.PitchQuadratic, options.PitchCubic,
+            options.PitchLinear, options.PitchQuadratic, options.PitchCubic,
+            SourceImageOuterRadiusMm: options.SamplingImageOuterRadiusMm,
+            PreviewOuterRadiusMm: options.OutputOuterRadiusMm);
+        DiffractionColorDisc.RenderPreview(imagePath, outputPath, preview, cancellationToken);
     }
 }

@@ -2,6 +2,7 @@ using System.Diagnostics;
 using DiscImageStudio.Core;
 using DiscImageStudio.Core.Calibration;
 using DvdImageSolver;
+using DvdImageSolver.Diffraction;
 using DvdImageSolver.Encoding;
 using DvdImageSolver.Solver;
 
@@ -228,6 +229,43 @@ public static class DvdStreamingGenerator
             summary.ControlledWords,
             summary.Elapsed,
             summary.CompatibilityChanges);
+    }
+
+    /// <summary>
+    /// Writes the design as one colour diffraction picture over the whole disc. Tone, thresholds and read
+    /// compatibility do not apply: every byte is chosen to form a grating.
+    /// </summary>
+    public static DvdStreamingSummary GenerateColor(
+        string imagePath,
+        Stream output,
+        DvdStreamingOptions options,
+        Action<DvdStreamingProgress>? progress = null,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(imagePath);
+        ArgumentNullException.ThrowIfNull(output);
+        ArgumentNullException.ThrowIfNull(options);
+        options = options with { ReadCompatibility = false };
+        options.Validate();
+        string sourceFullPath = Path.GetFullPath(imagePath);
+        MultiBlockSolveOptions solveOptions = CreateSolveOptions(options, 0, options.OutputSectors);
+        FastDvdStreamSummary summary = DiffractionColorDisc.WriteStream(
+            sourceFullPath,
+            output,
+            solveOptions,
+            value => progress?.Invoke(new DvdStreamingProgress(
+                value.BytesWritten,
+                value.TotalBytes,
+                value.CompletedBlocks,
+                value.TotalBlocks,
+                value.Elapsed)),
+            cancellationToken);
+        return new DvdStreamingSummary(
+            sourceFullPath,
+            summary.SectorsWritten,
+            summary.BytesWritten,
+            summary.ControlledWords,
+            summary.Elapsed);
     }
 
     /// <summary>

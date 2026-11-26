@@ -26,6 +26,17 @@ internal sealed class DiffractionLayout
     /// <summary>For payload byte p of a sector: is the code word just before it payload byte p - 1?</summary>
     private static readonly bool[] PrevIsPayload = BuildPrevIsPayload();
 
+    /// <summary>Payload byte that directly follows a SYNC code.</summary>
+    private static readonly bool[] FrameStart = BuildFrameStart();
+
+    /// <summary>Codes from here on refer to carrier strings.</summary>
+    internal const int StringCode = 256;
+
+    [ThreadStatic] private static int[]? t_codes;
+    [ThreadStatic] private static bool[]? t_fromString;
+
+    private readonly byte[][] _stringData;
+    private readonly short[][] _stringTrim;
     private readonly DvdTrackGeometry _geometry;
     private readonly double _bitMm;
     private readonly (double Centre, double Half, double RMin, double RMax)[] _sectors;
@@ -41,6 +52,34 @@ internal sealed class DiffractionLayout
         _geometry = geometry;
         _bitMm = channelBitLengthNm * 1e-6;
         Bridges = bridges is null ? DiffractionCarriers.FindBridges(BytesUsed()) : [.. bridges];
+        // String carriers of all pictures are numbered here: group g's variant w is code 256 + 256 g + w.
+        List<CarrierGroup> groups = [];
+        foreach (DiffractionPicture p in Pictures)
+        {
+            for (int v = 0; v < p.ViewCount; v++)
+            {
+                if (p.Carriers[v].Group is not CarrierGroup g) continue;
+                p.Codes[v] = StringCode + CarrierGroup.Variants * groups.Count;
+                groups.Add(g);
+            }
+        }
+
+        if (StringCode + CarrierGroup.Variants * groups.Count > ushort.MaxValue + 1)
+            throw new ArgumentException("Too many string carriers in one layout.");
+        if (groups.Count > 0 && OffByte != StringCarrier.Filler)
+            throw new ArgumentException($"String carriers need 0x{StringCarrier.Filler:X2} as the background byte.");
+        Groups = [.. groups];
+        _stringData = new byte[groups.Count * CarrierGroup.Variants][];
+        _stringTrim = new short[groups.Count * CarrierGroup.Variants][];
+        for (int g = 0; g < groups.Count; g++)
+        {
+            for (int w = 0; w < groups[g].Strings.Length; w++)
+            {
+                _stringData[g * CarrierGroup.Variants + w] = groups[g].Strings[w].Data;
+                _stringTrim[g * CarrierGroup.Variants + w] = groups[g].Strings[w].Trim;
+            }
+        }
+
         const double margin = 0.1;
         _sectors = new (double, double, double, double)[Pictures.Length];
         for (int k = 0; k < Pictures.Length; k++)
@@ -54,6 +93,7 @@ internal sealed class DiffractionLayout
     internal byte OffByte { get; }
     internal double ThetaRef { get; }
     internal List<(byte From, byte To, byte? Bridge)> Bridges { get; }
+    internal CarrierGroup[] Groups { get; }
     internal DvdTrackGeometry Geometry => _geometry;
     internal double SectorMm => BitsPerSector * _bitMm;
 
@@ -64,18 +104,19 @@ internal sealed class DiffractionLayout
         foreach (DiffractionPicture p in Pictures)
         {
             used.Add(p.OffByte);
-            foreach (byte c in p.Carriers) used.Add(c);
+            foreach (DiffractionCarrier c in p.Carriers)
+                if (c.Byte is byte b) used.Add(b);
         }
 
         return [.. used];
     }
 
-    /// <summary>Scrambled-domain byte for a payload byte centred at radius r and unwrapped spiral angle theta.</summary>
-    internal byte CodeAt(double r, double theta)
+    /// <summary>Code (a byte, or a string code) for a payload byte centred at radius r and unwrapped spiral angle theta.</summary>
+    internal int CodeAt(double r, double theta)
     {
         double phi = theta - ThetaRef;
         double x = r * Math.Sin(phi), y = r * Math.Cos(phi);
-        byte code = OffByte;
+        int code = OffByte;
         foreach (DiffractionPicture p in Pictures)
         {
             if (p.TryCell(x, y, out int j, out int i))
@@ -107,18 +148,105 @@ internal sealed class DiffractionLayout
         scrambled.Fill(OffByte);
         List<(int Start, int Stop)> slices = Slices(lba0);
         if (slices.Count == 0) return false;
+        int[] codes = t_codes ??= new int[SectorsPerBlock * PayloadBytes];
+        bool[] fromString = t_fromString ??= new bool[SectorsPerBlock * PayloadBytes];
+        Array.Fill(codes, OffByte);
         long firstBit = (long)lba0 * BitsPerSector;
         foreach ((int start, int stop) in slices)
         {
             for (int k = start; k < stop; k++)
             {
                 (double r, double theta) = _geometry.AtArcLengthFast((firstBit + BlockPayloadCentres[k]) * _bitMm);
-                scrambled[k] = CodeAt(r, theta);
+                codes[k] = CodeAt(r, theta);
             }
         }
 
-        ApplyBridges(scrambled);
+        Array.Clear(fromString);
+        for (int sector = 0; sector < SectorsPerBlock; sector++)
+        {
+            ReadOnlySpan<int> c = codes.AsSpan(sector * PayloadBytes, PayloadBytes);
+            Span<byte> output = scrambled.Slice(sector * PayloadBytes, PayloadBytes);
+            if (c.ContainsAnyInRange(StringCode, int.MaxValue))
+            {
+                ResolveStrings(c, output, fromString.AsSpan(sector * PayloadBytes, PayloadBytes));
+            }
+            else
+            {
+                for (int k = 0; k < PayloadBytes; k++) output[k] = (byte)c[k];
+            }
+        }
+
+        ApplyBridges(scrambled, fromString);
         return true;
+    }
+
+    /// <summary>
+    /// Writes out the carrier strings of one sector (DiscDiffractStudio's <c>DiscLayout._resolve_sectors</c>).
+    /// A "piece" is a maximal stretch of one sync frame's payload with the same carrier. A string piece gets the
+    /// first bytes of its string, so that its marks are exactly those designed:
+    /// <list type="bullet">
+    /// <item>it begins at the start of a sync frame, or behind two filler bytes (one is enough when the filler itself
+    /// began at the start of the frame); otherwise its first one or two bytes become filler. The same holds where a
+    /// string meets another carrier without filler in between;</item>
+    /// <item>the variant (period) is taken where the piece begins and kept to its end;</item>
+    /// <item>a piece followed by filler inside the frame is shortened where its length is a bad length.</item>
+    /// </list>
+    /// </summary>
+    internal void ResolveStrings(ReadOnlySpan<int> c, Span<byte> output, Span<bool> lit)
+    {
+        const int n = PayloadBytes;
+        Span<int> group = stackalloc int[n];
+        Span<int> start = stackalloc int[n];
+        Span<int> end = stackalloc int[n];
+        Span<int> need = stackalloc int[n];
+        for (int k = 0; k < n; k++)
+            group[k] = c[k] >= StringCode ? StringCode + (c[k] - StringCode) / CarrierGroup.Variants * CarrierGroup.Variants : c[k];
+        for (int k = 0; k < n; k++)
+        {
+            bool brk = k == 0 || FrameStart[k] || group[k] != group[k - 1];
+            start[k] = brk ? k : start[k - 1];
+        }
+
+        int next = n;
+        for (int k = n - 1; k >= 0; k--)
+        {
+            end[k] = next;                                   // first break after k
+            bool brk = k == 0 || FrameStart[k] || group[k] != group[k - 1];
+            if (brk) next = k;
+        }
+
+        for (int k = 0; k < n; k++)
+        {
+            bool isString = c[k] >= StringCode;
+            bool fill = group[k] == OffByte;
+            bool frameStart = FrameStart[k], sectorStart = k == 0;
+            int previous = Math.Max(k - 1, 0);
+            bool prevString = k > 0 && c[previous] >= StringCode;
+            bool prevFill = k > 0 && group[previous] == OffByte && !frameStart && !sectorStart;
+            int fillLength = k - start[previous];
+            int behindFiller = FrameStart[start[previous]] ? 0 : Math.Clamp(2 - fillLength, 0, 2);
+            bool touching = k > 0 && (isString || prevString);
+            int value = frameStart ? 0 : sectorStart ? 2 : prevFill ? behindFiller : touching ? 2 : 0;
+            bool applies = isString || (!fill && touching && !prevFill && !frameStart && !sectorStart);
+            need[k] = applies ? value : 0;
+        }
+
+        for (int k = 0; k < n; k++)
+        {
+            bool isString = c[k] >= StringCode;
+            int forced = need[start[k]];
+            int offset = k - start[k] - forced;
+            int first = Math.Min(start[k] + forced, n - 1);
+            int length = end[k] - start[k] - forced;
+            int sid = isString && length > 0 ? c[first] - StringCode : 0;
+            bool followed = end[k] < n && !FrameStart[end[k]];
+            int trim = followed && isString && length > 0 ? _stringTrim[sid][Math.Clamp(length, 0, StringCarrier.RunBytes)] : 0;
+            bool on = isString && offset >= 0 && offset < length - trim;
+            lit[k] = on;
+            output[k] = on ? _stringData[sid][offset]
+                : isString ? StringCarrier.Filler
+                : offset < 0 ? OffByte : (byte)c[k];
+        }
     }
 
     /// <summary>The stretches of an ECC block's payload that can lie inside a picture, in track order.</summary>
@@ -160,7 +288,7 @@ internal sealed class DiffractionLayout
     /// Writes the bridges: where a run of a carrier begins right after a run of another inside a sync
     /// frame and the switch would leave the recorder a choice, its first byte becomes the bridge byte.
     /// </summary>
-    internal void ApplyBridges(Span<byte> scrambled)
+    internal void ApplyBridges(Span<byte> scrambled, ReadOnlySpan<bool> fromString = default)
     {
         if (Bridges.Count == 0) return;
         byte[] prev = new byte[scrambled.Length];
@@ -171,7 +299,14 @@ internal sealed class DiffractionLayout
             if (c is not byte bridge) continue;
             for (int k = 0; k < scrambled.Length; k++)
             {
-                if (scrambled[k] == b && prev[k] == a && PrevIsPayload[k % PayloadBytes])
+                bool ok = PrevIsPayload[k % PayloadBytes];
+                if (ok && !fromString.IsEmpty)
+                {
+                    int before = k % PayloadBytes == 0 ? k + PayloadBytes - 1 : k - 1;
+                    ok = !fromString[k] && !fromString[before];
+                }
+
+                if (ok && scrambled[k] == b && prev[k] == a)
                     scrambled[k] = bridge;
             }
         }
@@ -207,6 +342,18 @@ internal sealed class DiffractionLayout
         }
 
         return centres;
+    }
+
+    private static bool[] BuildFrameStart()
+    {
+        bool[] start = new bool[PayloadBytes];
+        for (int p = 0; p < PayloadBytes; p++)
+        {
+            int col = (12 + p) % DataColumns;
+            start[p] = col == 0 || col == 91;
+        }
+
+        return start;
     }
 
     private static bool[] BuildPrevIsPayload()

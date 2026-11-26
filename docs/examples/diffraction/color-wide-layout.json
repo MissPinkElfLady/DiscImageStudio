@@ -1,0 +1,15 @@
+{
+  // One colour picture over the whole disc. A small lamp shows it in two opposite wedges across the hole;
+  // move the lamp round the disc, or turn the disc, to see the rest.
+  "discproj": "MyDVDCalibration.discproj",
+  "pictures": [
+    {
+      "name": "photo",
+      "centerMm": [0, 0],
+      "sizeMm": [118, 118],
+      "effect": "color",
+      "coverage": "wide",
+      "images": ["photo.png"]
+    }
+  ]
+}
