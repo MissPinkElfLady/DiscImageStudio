@@ -223,15 +223,3 @@ Tento projekt je licencován pod [GNU GPL v3.0 nebo novější](LICENSE) (`GPL-3
 ## Poděkování
 
 Děkujeme [projektu CDImage od arduinocelentano](https://github.com/arduinocelentano/cdimage), který ukázal, jak generováním zvukových stop CD vytvořit viditelné obrazy na povrchu disku. Implementace prokládání CD v tomto projektu byla převzata z jeho souvisejícího kódu a dále upravena; přístup ke kreslení na povrch CD byl také inspirován tímto projektem. Práce původního autora a přispěvatelů projektu CDImage poskytuje tomuto projektu důležitý základ.
-
----
-
-## Star History
-
-<a href="https://www.star-history.com/?repos=jiafeimiao-k-cat%2Fdiscimagestudio&type=date&legend=top-left">
- <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=jiafeimiao-k-cat/discimagestudio&type=date&theme=dark&legend=top-left" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=jiafeimiao-k-cat/discimagestudio&type=date&theme=light&legend=top-left" />
-   <img alt="Graf historie hvězd" src="https://api.star-history.com/chart?repos=jiafeimiao-k-cat/discimagestudio&type=date&theme=dark&legend=top-left" />
- </picture>
-</a>

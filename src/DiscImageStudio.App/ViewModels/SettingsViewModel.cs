@@ -106,7 +106,7 @@ public partial class SettingsViewModel : ObservableObject
     /// texts the standalone About dialog used to show.</summary>
     public string VersionText { get; } = BuildVersionText();
 
-    public string RepositoryUrl { get; } = "https://github.com/JiaFeiMiao-K-Cat/DiscImageStudio";
+    public string RepositoryUrl { get; } = "https://github.com/MissPinkElfLady/DiscImageStudio-Chroma";
 
     public string LicenseText { get; } = ReadLicense("GPL");
 

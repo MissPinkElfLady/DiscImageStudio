@@ -39,11 +39,12 @@ internal sealed record AppUpdateCheck(
 /// update files, verifies the manifest length, SHA-256, product version and PE architecture,
 /// then hands the running EXE to a short-lived PowerShell helper that waits for exit, swaps
 /// the file atomically and restarts it. The executable is unsigned, so the manifest is only as
-/// trustworthy as the release account. Only the official GitHub repository is supported; forks
-/// and GitHub Enterprise builds must be updated manually.</summary>
+/// trustworthy as the release account. Only this fork's GitHub repository (the colour-diffraction
+/// fork of JiaFeiMiao-K-Cat/DiscImageStudio) is supported, so a fork build never replaces itself
+/// with an upstream build that lacks its features; other builds must be updated manually.</summary>
 internal sealed class AppUpdateService
 {
-    internal const string OfficialRepository = "JiaFeiMiao-K-Cat/DiscImageStudio";
+    internal const string OfficialRepository = "MissPinkElfLady/DiscImageStudio-Chroma";
     internal const string RepositoryUrl = "https://github.com/" + OfficialRepository;
     internal const string ManifestUrl = RepositoryUrl + "/releases/latest/download/latest.json";
     internal const string HealthVariable = "DIS_UPDATE_HEALTH_FILE";
