@@ -25,7 +25,7 @@ Disc Image Studio 是一个多平台的光盘盘面图像生成与刻录工具�
 
 ## 关于本分支
 
-本仓库 [MissPinkElfLady/DiscImageStudio-Chroma](https://github.com/MissPinkElfLady/DiscImageStudio-Chroma) 是 Bronya 基于 JiaFeiMiao-K-Cat 及贡献者的 [Disc Image Studio](https://github.com/JiaFeiMiao-K-Cat/DiscImageStudio) 建立的分支，新增 **DVD-R 衍射光栅图像**，包括**彩色图像**；其余部分均为上游 Disc Image Studio。本分支与上游项目及下文致谢的项目作者无隶属或背书关系。
+本仓库 [MissPinkElfLady/DiscImageStudio-Chroma](https://github.com/MissPinkElfLady/DiscImageStudio-Chroma) 是 MissPinkElfLady 基于 JiaFeiMiao-K-Cat 及贡献者的 [Disc Image Studio](https://github.com/JiaFeiMiao-K-Cat/DiscImageStudio) 建立的分支，新增 **DVD-R 衍射光栅图像**，包括**彩色图像**；其余部分均为上游 Disc Image Studio。本分支与上游项目及下文致谢的项目作者无隶属或背书关系。
 
 **下载**：本分支可直接运行的构建见其 [Releases 页面](https://github.com/MissPinkElfLady/DiscImageStudio-Chroma/releases)：Windows x64 选 `win-x64.exe`，Windows 11 ARM64 选 `win-arm64.exe`，Linux 与 macOS 另有实验性 CLI 压缩包。下文「快速开始」中的链接指向上游构建，不含彩色功能。
 
@@ -55,7 +55,7 @@ Disc Image Studio 是一个多平台的光盘盘面图像生成与刻录工具�
 
 ### AI 生成说明
 
-本分支新增的全部内容——代码、测试、一致性脚本、文档以及本节——均由 AI（Anthropic 的 Claude，通过 Claude Code）编写。Bronya 负责指导、测试构建并实际刻录光盘；代码并非手写。以这种方式完成的提交带有 `Co-Authored-By: Claude` 标注。上游 Disc Image Studio 与 DiscDiffractStudio 的成果归其各自作者（DiscDiffractStudio 的 README 说明其本身完全由 AI 创建）。
+本分支新增的全部内容——代码、测试、一致性脚本、文档以及本节——均由 AI（Anthropic 的 Claude，通过 Claude Code）编写。MissPinkElfLady 负责指导、测试构建并实际刻录光盘；代码并非手写。以这种方式完成的提交带有 `Co-Authored-By: Claude` 标注。上游 Disc Image Studio 与 DiscDiffractStudio 的成果归其各自作者（DiscDiffractStudio 的 README 说明其本身完全由 AI 创建）。
 
 ### 许可证
 
