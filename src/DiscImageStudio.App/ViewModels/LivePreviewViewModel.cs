@@ -931,7 +931,11 @@ public partial class LivePreviewViewModel : ObservableObject
         CancellationTokenSource cancellation = new();
         _livePreviewCancellation = cancellation;
 
-        if (IsCalibrationPreview)
+        if (_state.DvdColor)
+        {
+            await RefreshDvdColorAsync(revision, cancellation.Token);
+        }
+        else if (IsCalibrationPreview)
         {
             await RefreshDvdCalibrationAsync(revision, cancellation.Token);
         }
@@ -993,6 +997,63 @@ public partial class LivePreviewViewModel : ObservableObject
         {
             ReportPreviewFailure(revision, cancellationToken, exception,
                 () => JobDiagnostics.FormatLog($"DVD preview · {options}", exception));
+        }
+        finally
+        {
+            if (!keepOutput)
+            {
+                TempFiles.TryDeleteTemporaryFile(outputPath);
+            }
+        }
+    }
+
+    /// <summary>Colour mode: the colour picture as it is written (from the design composite, laid out on the
+    /// generated geometry) projected onto the measured one. There is no colour read-back of an ISO, so both
+    /// preview modes show this.</summary>
+    private async Task RefreshDvdColorAsync(int revision, CancellationToken cancellationToken)
+    {
+        string? outputPath = null;
+        if (!TryBuildDvdCalibrationOptions(
+                out string imagePath,
+                out CalibrationPreviewOptions options,
+                out _,
+                out string message))
+        {
+            SetLivePreviewUnavailable(message);
+            return;
+        }
+
+        options = options with { StartLba = 0, FillSectors = checked((uint)_state.GetUsableSectors(OpticalDiscFamily.Dvd)) };
+        int outputSize = options.PreviewSize;
+        StatusText = L.Format("DvdColor.PreviewRefreshing", outputSize);
+        bool keepOutput = false;
+        try
+        {
+            outputPath = TempFiles.GetCacheFilePath($"dvd-live-colour-{revision}.png");
+            await StaWorker.RunAsync(() =>
+            {
+                DvdImageSolver.Diffraction.DiffractionColorDisc.RenderPreview(imagePath, outputPath, options,
+                    cancellationToken);
+                return 0;
+            });
+
+            cancellationToken.ThrowIfCancellationRequested();
+            if (revision != _livePreviewRevision)
+            {
+                return;
+            }
+
+            PublishPreview(outputPath, imagePath, "预览 - DVD", false);
+            keepOutput = true;
+            SetReadyStatus(() => L.Format("DvdColor.PreviewReady", outputSize, options.SamplesPerSector));
+        }
+        catch (OperationCanceledException)
+        {
+        }
+        catch (Exception exception)
+        {
+            ReportPreviewFailure(revision, cancellationToken, exception,
+                () => JobDiagnostics.FormatLog($"DVD colour preview · {options}", exception));
         }
         finally
         {

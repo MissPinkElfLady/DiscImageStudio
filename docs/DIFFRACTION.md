@@ -23,10 +23,12 @@ The engine is ported from [DiscDiffractStudio](https://github.com/Neo-626/DiscDi
   [Whole-disc colour](#whole-disc-colour)).
 - Multi-frame animation and viewing distances other than 50 cm are not ported yet. Carrier strings come
   from DiscDiffractStudio's table (`string_carriers.json`); periods it has not synthesised are refused.
-- In the app, DVD projects have a **Grayscale | Color (experimental)** switch on the Design page (under the
-  tone panel) and on the Export page. Color writes the design composite as one whole-disc colour picture for
-  Export and Burn, placed exactly where the grayscale picture would be. Tone settings and DVD compatibility
-  do not apply, and a colour disc cannot hold files yet. The ISO holds raw sectors without a file system.
+- In the app, DVD projects have a **Grayscale | Color** switch on the Design page (above the tone panel) and
+  on the Export page. Color writes the design composite as one whole-disc colour picture for Export and
+  Burn, placed exactly where the grayscale picture would be. The tone preview and the live preview show the
+  colours as encoded (both live-preview modes, since an ISO has no colour read-back yet). Dithering,
+  brightness and sRGB linearization are hidden, DVD compatibility does not apply, and a colour disc cannot
+  hold files yet. The ISO holds raw sectors without a file system.
 - Other effects (flips, stereo, spot colour) are command line only.
 - `--preview disc.png` draws the design; with `--preview-light DEGREES` it simulates what the eye sees with
   the lamp at that many degrees clockwise from 12 o'clock.

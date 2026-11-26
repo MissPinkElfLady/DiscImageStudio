@@ -73,6 +73,10 @@
         </Border>
 
         <StackPanel x:Name="ToneControls" Grid.Row="2" Grid.Column="0" Margin="0,14,0,0">
+            <!-- A DVD colour picture has no dithering, brightness or gamma step: the colour engine takes the
+                 design's colours in linear light as they are. -->
+            <controls:VisibilityGate IsOpen="{Binding State.DvdGreyscale}">
+            <StackPanel>
             <Grid>
                 <TextBlock Style="{StaticResource FieldLabel}" Margin="0" Text="{loc:Text Xaml.Dithering}" />
                 <TextBlock Style="{StaticResource RowText}" HorizontalAlignment="Right"
@@ -90,6 +94,8 @@
             <Slider Style="{StaticResource ToneBipolarSlider}" Minimum="-64" Maximum="64"
                     Value="{Binding State.ToneBrightness, Mode=TwoWay}"
                     AutomationProperties.Name="{loc:Text Xaml.Brightness}" />
+            </StackPanel>
+            </controls:VisibilityGate>
 
             <controls:VisibilityGate IsOpen="{Binding IsCd}" Margin="0,12,0,0">
                 <StackPanel>
@@ -102,11 +108,15 @@
                 </StackPanel>
             </controls:VisibilityGate>
 
-            <CheckBox Margin="0,12,0,0" Content="{loc:Text Xaml.SRGBLinearizationGamma}"
-                      IsChecked="{Binding State.ToneSrgbLinearization, Mode=TwoWay}"
-                      AutomationProperties.Name="{loc:Text Xaml.SRGBLinearization}" />
-            <TextBlock Style="{StaticResource CompactHint}" Margin="0,4,0,0"
-                       Text="{loc:Text Xaml.MayImproveTheVisibilityOfTheDiscArtwork}" />
+            <controls:VisibilityGate IsOpen="{Binding State.DvdGreyscale}">
+                <StackPanel>
+                    <CheckBox Margin="0,12,0,0" Content="{loc:Text Xaml.SRGBLinearizationGamma}"
+                              IsChecked="{Binding State.ToneSrgbLinearization, Mode=TwoWay}"
+                              AutomationProperties.Name="{loc:Text Xaml.SRGBLinearization}" />
+                    <TextBlock Style="{StaticResource CompactHint}" Margin="0,4,0,0"
+                               Text="{loc:Text Xaml.MayImproveTheVisibilityOfTheDiscArtwork}" />
+                </StackPanel>
+            </controls:VisibilityGate>
 
             <controls:VisibilityGate IsOpen="{Binding IsBluRay}" Margin="0,12,0,0">
                 <StackPanel>

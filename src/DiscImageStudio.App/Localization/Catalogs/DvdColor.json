@@ -18,22 +18,22 @@
     "cs": "Odstíny šedi"
   },
   "DvdColor.Colour": {
-    "zh-CN": "彩色（实验性）",
-    "en": "Color (experimental)",
-    "zh-TW": "彩色（實驗性）",
-    "ja": "カラー（試験的）",
-    "tr": "Renkli (deneysel)",
-    "es": "Color (experimental)",
-    "cs": "Barevně (experimentální)"
+    "zh-CN": "彩色",
+    "en": "Color",
+    "zh-TW": "彩色",
+    "ja": "カラー",
+    "tr": "Renkli",
+    "es": "Color",
+    "cs": "Barevně"
   },
   "DvdColor.Hint": {
-    "zh-CN": "以衍射光栅把设计写满整张盘：在一盏灯下可看到两个相对的扇形，移动灯或转动盘片即可看到整幅图。色调设置与 DVD 兼容性对彩色无效，暂不能加入文件。",
-    "en": "Writes the design over the whole disc as diffraction gratings. Under one lamp you see two opposite wedges; move the lamp or turn the disc to see the rest. Tone settings and DVD compatibility do not apply, and files cannot be added yet.",
-    "zh-TW": "以繞射光柵把設計寫滿整張光碟：在一盞燈下可看到兩個相對的扇形，移動燈或轉動光碟即可看到整幅圖。色調設定與 DVD 相容性對彩色無效，暫不能加入檔案。",
-    "ja": "デザインを回折格子としてディスク全体に書き込みます。1 つの照明では向かい合う 2 つの扇形が見え、照明を動かすかディスクを回すと残りが見えます。トーン設定と DVD 互換性は適用されず、ファイルはまだ追加できません。",
-    "tr": "Tasarımı kırınım ağları olarak tüm diske yazar. Tek bir lambanın altında karşılıklı iki dilim görünür; gerisini görmek için lambayı hareket ettirin ya da diski döndürün. Ton ayarları ve DVD uyumluluğu uygulanmaz; henüz dosya eklenemez.",
-    "es": "Escribe el diseño en todo el disco como redes de difracción. Bajo una lámpara se ven dos cuñas opuestas; mueve la lámpara o gira el disco para ver el resto. Los ajustes de tono y la compatibilidad de DVD no se aplican, y aún no se pueden añadir archivos.",
-    "cs": "Zapíše návrh na celý disk jako difrakční mřížky. Pod jednou lampou jsou vidět dvě protilehlé výseče; zbytek uvidíte, když lampou pohnete nebo disk otočíte. Nastavení tónu a kompatibilita DVD se nepoužijí a soubory zatím nelze přidat."
+    "zh-CN": "以衍射光栅把设计写满整张盘：在一盏灯下可看到两个相对的扇形，移动灯或转动盘片即可看到整幅图。DVD 兼容性对彩色无效，暂不能加入文件。",
+    "en": "Writes the design over the whole disc as diffraction gratings. Under one lamp you see two opposite wedges; move the lamp or turn the disc to see the rest. DVD compatibility does not apply, and files cannot be added yet.",
+    "zh-TW": "以繞射光柵把設計寫滿整張光碟：在一盞燈下可看到兩個相對的扇形，移動燈或轉動光碟即可看到整幅圖。DVD 相容性對彩色無效，暫不能加入檔案。",
+    "ja": "デザインを回折格子としてディスク全体に書き込みます。1 つの照明では向かい合う 2 つの扇形が見え、照明を動かすかディスクを回すと残りが見えます。DVD 互換性は適用されず、ファイルはまだ追加できません。",
+    "tr": "Tasarımı kırınım ağları olarak tüm diske yazar. Tek bir lambanın altında karşılıklı iki dilim görünür; gerisini görmek için lambayı hareket ettirin ya da diski döndürün. DVD uyumluluğu uygulanmaz; henüz dosya eklenemez.",
+    "es": "Escribe el diseño en todo el disco como redes de difracción. Bajo una lámpara se ven dos cuñas opuestas; mueve la lámpara o gira el disco para ver el resto. La compatibilidad de DVD no se aplica y aún no se pueden añadir archivos.",
+    "cs": "Zapíše návrh na celý disk jako difrakční mřížky. Pod jednou lampou jsou vidět dvě protilehlé výseče; zbytek uvidíte, když lampou pohnete nebo disk otočíte. Kompatibilita DVD se nepoužije a soubory zatím nelze přidat."
   },
   "DvdColor.NoFiles": {
     "zh-CN": "彩色 DVD 暂不能加入文件。请清空设计页的文件夹，或改用灰度。",
@@ -61,5 +61,23 @@
     "tr": "Renkli DVD · {0} sektör · {1:F1} MiB",
     "es": "DVD en color · {0} sectores · {1:F1} MiB",
     "cs": "Barevné DVD · {0} sektorů · {1:F1} MiB"
+  },
+  "DvdColor.PreviewRefreshing": {
+    "zh-CN": "正在刷新 {0} px DVD 彩色预览…",
+    "en": "Refreshing {0} px DVD color preview…",
+    "zh-TW": "正在重新整理 {0} px DVD 彩色預覽…",
+    "ja": "{0} px の DVD カラープレビューを更新しています…",
+    "tr": "{0} px DVD renkli önizlemesi yenileniyor…",
+    "es": "Actualizando la vista previa en color del DVD de {0} px…",
+    "cs": "Obnovuje se barevný náhled DVD {0} px…"
+  },
+  "DvdColor.PreviewReady": {
+    "zh-CN": "已实时更新 · 彩色图 · CW · {0} px · 每扇区 {1} 个采样",
+    "en": "Updated · Color picture · CW · {0} px · {1} samples per sector",
+    "zh-TW": "已即時更新 · 彩色圖 · CW · {0} px · 每磁區 {1} 個取樣",
+    "ja": "更新済み · カラー画像 · CW · {0} px · セクターあたり {1} サンプル",
+    "tr": "Güncellendi · Renkli resim · CW · {0} px · sektör başına {1} örnek",
+    "es": "Actualizado · Imagen en color · CW · {0} px · {1} muestras por sector",
+    "cs": "Aktualizováno · Barevný obraz · CW · {0} px · {1} vzorků na sektor"
   }
 }
