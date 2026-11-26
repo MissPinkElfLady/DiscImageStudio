@@ -1,0 +1,14 @@
+{
+  // One colour picture, seen by tilting the disc with a small lamp above your line of sight.
+  "discproj": "MyDVDCalibration.discproj",
+  "pictures": [
+    {
+      "name": "photo",
+      "centerMm": [43, 0],          // 3 o'clock
+      "sizeMm": [24, 24],
+      "effect": "color",
+      "copies": 1,                  // 2: colours right at two tilts, each dimmer
+      "images": ["photo.png"]
+    }
+  ]
+}

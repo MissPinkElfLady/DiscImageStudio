@@ -5,3 +5,4 @@
 *.slnx text eol=crlf
 *.png binary
 *.ico binary
+*.gz binary

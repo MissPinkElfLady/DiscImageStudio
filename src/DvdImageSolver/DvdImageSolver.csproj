@@ -8,6 +8,10 @@
     <InvariantGlobalization>true</InvariantGlobalization>
   </PropertyGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Diffraction\string_carriers.json.gz"
+                      LogicalName="DvdImageSolver.Diffraction.string_carriers.json.gz" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\DiscImageStudio.ImageIO\DiscImageStudio.ImageIO.csproj" />
     <ProjectReference Include="..\DiscImageStudio.Core\DiscImageStudio.Core.csproj" />
     <ProjectReference Include="..\DiscImageStudio.Iso\DiscImageStudio.Iso.csproj" />

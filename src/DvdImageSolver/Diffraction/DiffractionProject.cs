@@ -18,8 +18,10 @@ namespace DvdImageSolver.Diffraction;
 ///   ]
 /// }
 /// </code>
-/// Canvas: millimetres from the hub, X right, Y up, seen from the data side. Effects: "single" (one image on
-/// 0x92), "flip" and "stereo" (two images on 0x92 / 0xB9). "carriers" (e.g. ["0x92", "0xB9", "0x66"]) may
+/// Canvas: millimetres from the hub, X right, Y up, seen from the data side. Effects: "single" (one grey image on
+/// 0x92), "flip" and "stereo" (two grey images on 0x92 / 0xB9), "color" (one colour image seen by tilting, at 3 or
+/// 9 o'clock, or at 12 / 6 o'clock with a quarter turn; "copies": 1 or 2 tilts where its colours are right).
+/// "brightness" scales every view's lit share. "carriers" (e.g. ["0x92", "0xB9", "0x66"]) may
 /// be given instead of an effect; "gains" defaults to equal white, "turnCounts" to one turn each.
 /// Relative paths are relative to the layout file.
 /// </summary>
@@ -93,38 +95,51 @@ internal static class DiffractionProject
         double[] centre = Doubles(p.GetProperty("centerMm"), 2, "centerMm");
         double[] size = Doubles(p.GetProperty("sizeMm"), 2, "sizeMm");
         double cell = Optional(p, "cellMm", 0.05);
+        string[] images = [.. p.GetProperty("images").EnumerateArray().Select(x => Resolve(baseDir, x.GetString()!))];
+        int quarterTurns = p.TryGetProperty("quarterTurns", out JsonElement q) ? q.GetInt32() : 0;
+        double brightness = Optional(p, "brightness", 1.0);
+        int nx = (int)Math.Round(size[0] / cell, MidpointRounding.ToEven);
+        int ny = (int)Math.Round(size[1] / cell, MidpointRounding.ToEven);
+        // The images are sampled in the orientation they are drawn; a quarter turn swaps the cell grid.
+        (int vy, int vx) = quarterTurns % 2 == 0 ? (ny, nx) : (nx, ny);
+        string effect = p.TryGetProperty("effect", out JsonElement e) ? (e.GetString() ?? "single").ToLowerInvariant() : "single";
+
+        if (!p.TryGetProperty("carriers", out JsonElement c) && effect is "color" or "colour")
+        {
+            if (images.Length != 1)
+                throw new ArgumentException($"Picture {name}: a colour picture takes one image, got {images.Length}.");
+            int copies = p.TryGetProperty("copies", out JsonElement k) ? k.GetInt32() : 1;
+            var (red, green, blue) = DiffractionImages.LinearRgbCells(images[0], vy, vx);
+            return DiffractionColor.Build(name, (centre[0], centre[1]), (size[0], size[1]), red, green, blue, copies,
+                quarterTurns, cell, brightness);
+        }
+
         byte[] carriers;
-        if (p.TryGetProperty("carriers", out JsonElement c))
+        if (p.TryGetProperty("carriers", out c))
         {
             carriers = [.. c.EnumerateArray().Select(ParseByte)];
         }
         else
         {
-            string effect = p.TryGetProperty("effect", out JsonElement e) ? e.GetString() ?? "single" : "single";
-            carriers = effect.ToLowerInvariant() switch
+            carriers = effect switch
             {
                 "single" => [0x92],
                 "flip" or "stereo" => [0x92, 0xB9],
-                _ => throw new ArgumentException($"Picture {name}: effect \"{effect}\" is not one of single, flip, stereo."),
+                _ => throw new ArgumentException($"Picture {name}: effect \"{effect}\" is not one of single, flip, stereo, color."),
             };
         }
 
-        string[] images = [.. p.GetProperty("images").EnumerateArray().Select(x => Resolve(baseDir, x.GetString()!))];
         if (images.Length != carriers.Length)
             throw new ArgumentException($"Picture {name}: {carriers.Length} carrier(s) need {carriers.Length} image(s), got {images.Length}.");
-        int quarterTurns = p.TryGetProperty("quarterTurns", out JsonElement q) ? q.GetInt32() : 0;
-        int nx = (int)Math.Round(size[0] / cell, MidpointRounding.ToEven);
-        int ny = (int)Math.Round(size[1] / cell, MidpointRounding.ToEven);
-        // The views are sampled in the orientation they are drawn; a quarter turn swaps the cell grid.
-        (int vy, int vx) = quarterTurns % 2 == 0 ? (ny, nx) : (nx, ny);
         List<double[,]> views = [.. images.Select(path => DiffractionImages.LinearLuminanceCells(path, vy, vx))];
-        double[]? gains = p.TryGetProperty("gains", out JsonElement g)
+        double[] gains = p.TryGetProperty("gains", out JsonElement g)
             ? [.. g.EnumerateArray().Select(x => x.GetDouble())]
             : DiffractionCarriers.DefaultGains(carriers);
+        gains = [.. gains.Select(x => x * brightness)];
         int[]? turns = p.TryGetProperty("turnCounts", out JsonElement t) ? [.. t.EnumerateArray().Select(x => x.GetInt32())] : null;
         byte off = p.TryGetProperty("offByte", out JsonElement o) ? ParseByte(o) : DiffractionCarriers.OffByte;
-        return new DiffractionPicture(name, (centre[0], centre[1]), (size[0], size[1]), views, carriers,
-            linear: true, gains, turns, quarterTurns, cell, off);
+        return new DiffractionPicture(name, (centre[0], centre[1]), (size[0], size[1]), views,
+            [.. carriers.Select(x => (DiffractionCarrier)x)], linear: true, gains, turns, quarterTurns, cell, off);
     }
 
     private static string Resolve(string baseDir, string path) => Path.GetFullPath(Path.Combine(baseDir, path));

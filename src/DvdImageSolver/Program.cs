@@ -1368,7 +1368,7 @@ internal static class Program
         foreach (var picture in loaded.Layout.Pictures)
         {
             string shares = string.Join(", ", Enumerable.Range(0, picture.ViewCount)
-                .Select(v => $"0x{picture.Carriers[v]:X2} lit {picture.LitShare(v):P0}"));
+                .Select(v => $"{picture.Carriers[v].Label} lit {picture.LitShare(v):P0}"));
             Console.WriteLine($"{picture.Name}: {picture.Nx} x {picture.Ny} cells; {shares}");
         }
 

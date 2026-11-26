@@ -15,28 +15,58 @@ internal static class DiffractionImages
     }
 
     /// <summary>
-    /// Reads an image and averages it onto ny x nx cells in linear light, then takes the luminance
-    /// (DiscDiffractStudio's "cells" sampling). Transparent pixels count as black. Values are linear light.
+    /// Reads an image, cuts it down around its middle to the cells' aspect ratio, averages it onto ny x nx cells in
+    /// linear light and returns the linear-light red, green and blue channels (DiscDiffractStudio's "cells"
+    /// sampling, with area averaging in place of Pillow's Lanczos). Transparent pixels count as black.
     /// </summary>
-    internal static double[,] LinearLuminanceCells(string path, int ny, int nx)
+    internal static (double[,] R, double[,] G, double[,] B) LinearRgbCells(string path, int ny, int nx)
     {
         BgraRaster image = RasterCodec.LoadBgra32(path);
         int w = image.Width, h = image.Height;
+        double aspect = (double)nx / ny;
+        double x0 = 0, y0 = 0, x1 = w, y1 = h, cw = w, ch = h;
+        if (cw / ch > aspect)
+        {
+            double keep = ch * aspect;
+            (x0, x1) = ((cw - keep) / 2, (cw - keep) / 2 + keep);
+        }
+        else if (cw / ch < aspect)
+        {
+            double keep = cw / aspect;
+            (y0, y1) = ((ch - keep) / 2, (ch - keep) / 2 + keep);
+        }
+
+        int left = (int)Math.Round(x0, MidpointRounding.ToEven), top = (int)Math.Round(y0, MidpointRounding.ToEven);
+        int cropW = Math.Max(1, (int)Math.Round(x1, MidpointRounding.ToEven) - left);
+        int cropH = Math.Max(1, (int)Math.Round(y1, MidpointRounding.ToEven) - top);
         double[] lin = new double[256];
         for (int k = 0; k < 256; k++) lin[k] = SrgbToLinear(k / 255.0);
-        double[,] luminance = new double[h, w];
+        double[][,] channels = [new double[cropH, cropW], new double[cropH, cropW], new double[cropH, cropW]];
         ReadOnlySpan<byte> px = image.Pixels;
-        for (int y = 0; y < h; y++)
+        for (int y = 0; y < cropH; y++)
         {
-            for (int x = 0; x < w; x++)
+            for (int x = 0; x < cropW; x++)
             {
-                int o = (y * w + x) * 4;
+                int o = ((top + y) * w + left + x) * 4;
                 double a = px[o + 3] / 255.0;
-                luminance[y, x] = a * (LumaB * lin[px[o]] + LumaG * lin[px[o + 1]] + LumaR * lin[px[o + 2]]);
+                channels[0][y, x] = a * lin[px[o + 2]];
+                channels[1][y, x] = a * lin[px[o + 1]];
+                channels[2][y, x] = a * lin[px[o]];
             }
         }
 
-        return Resample(luminance, ny, nx);
+        return (Resample(channels[0], ny, nx), Resample(channels[1], ny, nx), Resample(channels[2], ny, nx));
+    }
+
+    /// <summary>Linear-light luminance on ny x nx cells (see <see cref="LinearRgbCells"/>).</summary>
+    internal static double[,] LinearLuminanceCells(string path, int ny, int nx)
+    {
+        var (r, g, b) = LinearRgbCells(path, ny, nx);
+        double[,] luminance = new double[ny, nx];
+        for (int j = 0; j < ny; j++)
+            for (int i = 0; i < nx; i++)
+                luminance[j, i] = LumaR * r[j, i] + LumaG * g[j, i] + LumaB * b[j, i];
+        return luminance;
     }
 
     /// <summary>

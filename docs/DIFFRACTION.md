@@ -12,9 +12,14 @@ The engine is ported from [DiscDiffractStudio](https://github.com/Neo-626/DiscDi
 ## Status
 
 - DVD-R only. Other media and burners have not been tried.
-- Single-byte carriers only: `0x92` (16T), `0xB9` (10.67T), `0x66` (8T) on an `0xA5` background.
-  Animations with more frames, viewing distances other than 50 cm and colour need DiscDiffractStudio's
-  91-byte string carriers, which are not ported yet.
+- Grey effects use single-byte carriers: `0x92` (16T), `0xB9` (10.67T), `0x66` (8T) on an `0xA5`
+  background.
+- One colour picture (`"effect": "color"`) uses DiscDiffractStudio's 91-byte string carriers with period
+  compensation and white balance. Its colours are right near one tilt (`"copies": 1`, brightest) or two
+  tilts (`"copies": 2`, the same picture written twice, each copy dimmer). A third copy would need
+  gratings shorter than the 6.4T that can be written.
+- Multi-frame animation and viewing distances other than 50 cm are not ported yet. Carrier strings come
+  from DiscDiffractStudio's table (`string_carriers.json`); periods it has not synthesised are refused.
 - Command line only; no Design-workspace integration yet. The ISO holds raw sectors without a file system.
 - No diffraction preview yet.
 
@@ -31,10 +36,14 @@ A layout names the calibration and the pictures; see
 
 - Canvas: millimetres from the hub, X right, Y up, as the data side is seen. `thetaRefDegrees` (default 0,
   as in DiscDiffractStudio) is the spiral angle that points to the top.
-- `effect`: `single` (one image, `0x92`), `flip` or `stereo` (two images, `0x92` / `0xB9`). Or give
-  `carriers` directly, with optional `gains` and `turnCounts`.
+- `effect`: `single` (one grey image, `0x92`), `flip` or `stereo` (two grey images, `0x92` / `0xB9`), or
+  `color` (one colour image, with `copies` 1 or 2). Or give `carriers` directly, with optional `gains` and
+  `turnCounts`. `brightness` scales every view's lit share.
+- A colour picture is seen by tilting, so its tracks must run up and down through it: put it at 3 or 9
+  o'clock, or at 12 / 6 o'clock with a quarter turn.
 - `quarterTurns`: counter-clockwise quarter turns of the images on the canvas.
-- Images are averaged onto 0.05 mm cells in linear light and reduced to luminance. Bright, high-contrast
+- Images are cut down around their middle to the picture's aspect ratio, averaged onto 0.05 mm cells in
+  linear light, and reduced to luminance (grey effects) or kept as red, green and blue (colour). Bright, high-contrast
   material works best; dark material burns dark.
 
 How to look at the disc (from DiscDiffractStudio): use a small bright lamp about a metre away. Pictures at
@@ -56,12 +65,27 @@ The generator fills whole ECC blocks of scrambled-domain bytes through
 `FastDispersionImageWriter.WriteScrambledBlockStream`, which descrambles and streams them like the
 normal DVD writer.
 
+## Colour
+
+The picture's red, green and blue channels go on three string carriers of 16T, 13.93T and 12.13T (ratio
+2^(1/5)). From the design pose (eyes 50 cm away, lamp 1 m away straight above the line of sight) an eye at
+u = 0.288 sees them as 614, 535 and 466 nm. Each carrier's period changes across the picture in 0.5 % steps
+so that every cell shows the colour the centre shows, and the turns are shared out 7 : 8 : 17 (two copies:
+3 : 3 : 7 : 4 : 5 : 10 of every 32) so that equal channels give D65 white under a white LED.
+
+A grating sends each colour to its own direction, so the colours drift as the disc is tilted away from the
+design tilt. That is physics, not a limitation of the program: a second copy only adds a second tilt
+where the colours are right.
+
 ## Parity with DiscDiffractStudio
 
 `DvdImageSolver selftest` builds a fixed synthetic layout (three pictures, two to three views each) and
 checks the SHA-256 of 42 ECC blocks against DiscDiffractStudio's own output. The expected hashes come
 from `tools/DiffractionParity/make_vectors.py`, run against a DiscDiffractStudio checkout. A full
-240,976-sector ISO of a smaller layout was also compared once and matched byte for byte.
+240,976-sector ISO of a smaller layout was also compared once and matched byte for byte. The colour
+effect is checked the same way against DiscDiffractStudio's colour flip with the same channels as both
+pictures (two copies) or only its first trio (one copy): turn counts, gains, every carrier string and
+compensation map, and 56 ECC blocks (`tools/DiffractionParity/make_color_vectors.py`).
 
 The image loading differs on purpose: DiscDiffractStudio resamples with Pillow, this port averages in
 linear light itself, so pictures made from image files can differ by a grey step at cell edges.

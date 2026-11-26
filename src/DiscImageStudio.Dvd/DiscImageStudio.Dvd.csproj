@@ -19,6 +19,8 @@
     <Compile Include="../DvdImageSolver/**/*.cs"
              Exclude="../DvdImageSolver/bin/**;../DvdImageSolver/obj/**"
              LinkBase="Engine" />
+    <EmbeddedResource Include="../DvdImageSolver/Diffraction/string_carriers.json.gz"
+                      LogicalName="DvdImageSolver.Diffraction.string_carriers.json.gz" />
     <ProjectReference Include="../DiscImageStudio.Iso/DiscImageStudio.Iso.csproj" />
     <ProjectReference Include="../DiscImageStudio.ImageIO/DiscImageStudio.ImageIO.csproj" />
   </ItemGroup>
