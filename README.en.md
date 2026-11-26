@@ -27,6 +27,8 @@ Disc Image Studio is a multi-platform disc-surface image generation and burning 
 
 This is [MissPinkElfLady/DiscImageStudio](https://github.com/MissPinkElfLady/DiscImageStudio), Bronya's fork of [Disc Image Studio](https://github.com/JiaFeiMiao-K-Cat/DiscImageStudio) by JiaFeiMiao-K-Cat and contributors. It adds **diffraction-grating pictures for DVD-R**, including **colour pictures**. Everything else is upstream Disc Image Studio. The fork is not affiliated with or endorsed by the upstream project or by the authors of the projects credited below.
 
+**Download:** ready-to-run builds of this fork are on its [Releases page](https://github.com/MissPinkElfLady/DiscImageStudio/releases): `win-x64.exe` for Windows x64, `win-arm64.exe` for Windows 11 ARM64, and experimental CLI archives for Linux and macOS. The Quick Start links below point to upstream builds, which do not have the colour features.
+
 ### What the fork adds
 
 - **Diffraction engine** (`diffract` command, `src/DvdImageSolver/Diffraction`): writes several gratings with different periods, so different pictures are seen from different directions. This gives single pictures, two-frame flips that switch as the disc tilts, and stereo pairs. The output matches DiscDiffractStudio byte for byte (see below).

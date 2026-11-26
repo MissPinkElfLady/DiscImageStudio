@@ -27,6 +27,8 @@ Disc Image Studio 是一个多平台的光盘盘面图像生成与刻录工具�
 
 本仓库 [MissPinkElfLady/DiscImageStudio](https://github.com/MissPinkElfLady/DiscImageStudio) 是 Bronya 基于 JiaFeiMiao-K-Cat 及贡献者的 [Disc Image Studio](https://github.com/JiaFeiMiao-K-Cat/DiscImageStudio) 建立的分支，新增 **DVD-R 衍射光栅图像**，包括**彩色图像**；其余部分均为上游 Disc Image Studio。本分支与上游项目及下文致谢的项目作者无隶属或背书关系。
 
+**下载**：本分支可直接运行的构建见其 [Releases 页面](https://github.com/MissPinkElfLady/DiscImageStudio/releases)：Windows x64 选 `win-x64.exe`，Windows 11 ARM64 选 `win-arm64.exe`，Linux 与 macOS 另有实验性 CLI 压缩包。下文「快速开始」中的链接指向上游构建，不含彩色功能。
+
 ### 本分支新增的功能
 
 - **衍射图像引擎**（`diffract` 命令，`src/DvdImageSolver/Diffraction`）：写入多种周期的光栅，从不同方向看到不同的图：单张图、随倾斜切换的两帧图和立体图。输出与 DiscDiffractStudio 逐字节一致（见下文）。
