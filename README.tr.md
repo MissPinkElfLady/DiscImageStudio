@@ -221,15 +221,3 @@ Bu proje [GNU GPL v3.0 veya üzeri](LICENSE) (`GPL-3.0-or-later`) lisansı ile l
 ## Teşekkürler
 
 CD ses izleri oluşturarak disk yüzeyinde görünür görüntüler oluşturulabileceğini gösteren [arduinocelentano'nun CDImage projesine](https://github.com/arduinocelentano/cdimage) teşekkür ederiz. Bu projenin CD serpiştirme (interleaving) uygulaması ilgili koddan uyarlanmış ve geliştirilmiştir; CD yüzeyine çizim yapma yaklaşımı da ondan ilham almıştır. CDImage'ın orijinal yazarının ve katkıda bulunanlarının çalışmaları bu proje için önemli bir temel oluşturmaktadır.
-
----
-
-## Star History
-
-<a href="https://www.star-history.com/?repos=jiafeimiao-k-cat%2Fdiscimagestudio&type=date&legend=top-left">
- <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=jiafeimiao-k-cat/discimagestudio&type=date&theme=dark&legend=top-left" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=jiafeimiao-k-cat/discimagestudio&type=date&legend=top-left" />
-   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=jiafeimiao-k-cat/discimagestudio&type=date&legend=top-left" />
- </picture>
-</a>

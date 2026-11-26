@@ -25,9 +25,9 @@ Disc Image Studio 是一个多平台的光盘盘面图像生成与刻录工具�
 
 ## 关于本分支
 
-本仓库 [MissPinkElfLady/DiscImageStudio](https://github.com/MissPinkElfLady/DiscImageStudio) 是 Bronya 基于 JiaFeiMiao-K-Cat 及贡献者的 [Disc Image Studio](https://github.com/JiaFeiMiao-K-Cat/DiscImageStudio) 建立的分支，新增 **DVD-R 衍射光栅图像**，包括**彩色图像**；其余部分均为上游 Disc Image Studio。本分支与上游项目及下文致谢的项目作者无隶属或背书关系。
+本仓库 [MissPinkElfLady/DiscImageStudio-Chroma](https://github.com/MissPinkElfLady/DiscImageStudio-Chroma) 是 Bronya 基于 JiaFeiMiao-K-Cat 及贡献者的 [Disc Image Studio](https://github.com/JiaFeiMiao-K-Cat/DiscImageStudio) 建立的分支，新增 **DVD-R 衍射光栅图像**，包括**彩色图像**；其余部分均为上游 Disc Image Studio。本分支与上游项目及下文致谢的项目作者无隶属或背书关系。
 
-**下载**：本分支可直接运行的构建见其 [Releases 页面](https://github.com/MissPinkElfLady/DiscImageStudio/releases)：Windows x64 选 `win-x64.exe`，Windows 11 ARM64 选 `win-arm64.exe`，Linux 与 macOS 另有实验性 CLI 压缩包。下文「快速开始」中的链接指向上游构建，不含彩色功能。
+**下载**：本分支可直接运行的构建见其 [Releases 页面](https://github.com/MissPinkElfLady/DiscImageStudio-Chroma/releases)：Windows x64 选 `win-x64.exe`，Windows 11 ARM64 选 `win-arm64.exe`，Linux 与 macOS 另有实验性 CLI 压缩包。下文「快速开始」中的链接指向上游构建，不含彩色功能。
 
 ### 本分支新增的功能
 
@@ -265,15 +265,3 @@ CD 公共编码部分还参考了 [ECMA-130，第 2 版（CD-ROM，1996）](http
 感谢 [arduinocelentano 的 CDImage 项目](https://github.com/arduinocelentano/cdimage)，它展示了通过生成 CD 音轨在盘面形成可见图像的方法。本项目的 CD 交织实现由其相关代码移植并继续修改，CD 盘面绘图思路也受其启发。CDImage 原作者及贡献者的工作为本项目提供了重要基础。
 
 本分支还感谢 Neo-626 的 [DiscDiffractStudio](https://github.com/Neo-626/DiscDiffractStudio)（衍射与彩色图像引擎即移植自它）以及 [Disc Color Studio](https://github.com/Neo-626/DiscColorStudio)（为彩色工作提供了参考）。
-
----
-
-## Star History
-
-<a href="https://www.star-history.com/?repos=jiafeimiao-k-cat%2Fdiscimagestudio&type=date&legend=top-left">
- <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=jiafeimiao-k-cat/discimagestudio&type=date&theme=dark&legend=top-left" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=jiafeimiao-k-cat/discimagestudio&type=date&legend=top-left" />
-   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=jiafeimiao-k-cat/discimagestudio&type=date&legend=top-left" />
- </picture>
-</a>

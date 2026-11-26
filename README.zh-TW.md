@@ -222,15 +222,3 @@ CD 共通編碼部分也參考了 [ECMA-130，第 2 版（CD-ROM，1996）](http
 ## 致謝
 
 感謝 [arduinocelentano 的 CDImage 專案](https://github.com/arduinocelentano/cdimage)，它展示了透過產生 CD 音軌，在碟面形成可見圖像的方法。本專案的 CD 交錯實作由其相關程式碼移植並持續修改，CD 碟面繪圖的構想也受到其啟發。CDImage 原作者及貢獻者的工作，為本專案提供了重要基礎。
-
----
-
-## Star History
-
-<a href="https://www.star-history.com/?repos=jiafeimiao-k-cat%2Fdiscimagestudio&type=date&legend=top-left">
- <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=jiafeimiao-k-cat/discimagestudio&type=date&theme=dark&legend=top-left" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=jiafeimiao-k-cat/discimagestudio&type=date&legend=top-left" />
-   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=jiafeimiao-k-cat/discimagestudio&type=date&legend=top-left" />
- </picture>
-</a>

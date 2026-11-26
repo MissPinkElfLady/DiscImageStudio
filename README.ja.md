@@ -222,15 +222,3 @@ CD の共通エンコード部分については、[ECMA-130、第 2 版（CD-RO
 ## 謝辞
 
 [arduinocelentano 氏の CDImage プロジェクト](https://github.com/arduinocelentano/cdimage)に感謝します。このプロジェクトは、CD 音声トラックを生成してディスクの記録面に可視画像を形成する方法を示しました。本プロジェクトの CD インターリーブ実装はその関連コードから移植し、さらに改変したものであり、CD の記録面に描画するという発想もそこから着想を得ています。CDImage の原作者およびコントリビューターの皆さまの成果は、本プロジェクトの重要な基盤となっています。
-
----
-
-## Star History
-
-<a href="https://www.star-history.com/?repos=jiafeimiao-k-cat%2Fdiscimagestudio&type=date&legend=top-left">
- <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=jiafeimiao-k-cat/discimagestudio&type=date&theme=dark&legend=top-left" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=jiafeimiao-k-cat/discimagestudio&type=date&legend=top-left" />
-   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=jiafeimiao-k-cat/discimagestudio&type=date&legend=top-left" />
- </picture>
-</a>

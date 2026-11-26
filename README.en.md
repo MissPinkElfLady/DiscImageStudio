@@ -25,9 +25,9 @@ Disc Image Studio is a multi-platform disc-surface image generation and burning 
 
 ## About this fork
 
-This is [MissPinkElfLady/DiscImageStudio](https://github.com/MissPinkElfLady/DiscImageStudio), Bronya's fork of [Disc Image Studio](https://github.com/JiaFeiMiao-K-Cat/DiscImageStudio) by JiaFeiMiao-K-Cat and contributors. It adds **diffraction-grating pictures for DVD-R**, including **colour pictures**. Everything else is upstream Disc Image Studio. The fork is not affiliated with or endorsed by the upstream project or by the authors of the projects credited below.
+This is [MissPinkElfLady/DiscImageStudio-Chroma](https://github.com/MissPinkElfLady/DiscImageStudio-Chroma), Bronya's fork of [Disc Image Studio](https://github.com/JiaFeiMiao-K-Cat/DiscImageStudio) by JiaFeiMiao-K-Cat and contributors. It adds **diffraction-grating pictures for DVD-R**, including **colour pictures**. Everything else is upstream Disc Image Studio. The fork is not affiliated with or endorsed by the upstream project or by the authors of the projects credited below.
 
-**Download:** ready-to-run builds of this fork are on its [Releases page](https://github.com/MissPinkElfLady/DiscImageStudio/releases): `win-x64.exe` for Windows x64, `win-arm64.exe` for Windows 11 ARM64, and experimental CLI archives for Linux and macOS. The Quick Start links below point to upstream builds, which do not have the colour features.
+**Download:** ready-to-run builds of this fork are on its [Releases page](https://github.com/MissPinkElfLady/DiscImageStudio-Chroma/releases): `win-x64.exe` for Windows x64, `win-arm64.exe` for Windows 11 ARM64, and experimental CLI archives for Linux and macOS. The Quick Start links below point to upstream builds, which do not have the colour features.
 
 ### What the fork adds
 
@@ -277,15 +277,3 @@ This project is licensed under [GNU GPL v3.0 or later](LICENSE) (`GPL-3.0-or-lat
 Thanks to [arduinocelentano’s CDImage project](https://github.com/arduinocelentano/cdimage), which demonstrated how to create visible images on a disc surface by generating CD audio tracks. This project’s CD interleaving implementation was ported from its related code and further modified, and the approach to drawing on CD surfaces was also inspired by it. The work of CDImage’s original author and contributors provides an important foundation for this project.
 
 This fork also thanks Neo-626 for [DiscDiffractStudio](https://github.com/Neo-626/DiscDiffractStudio), whose engine its diffraction and colour pictures are ported from, and for [Disc Color Studio](https://github.com/Neo-626/DiscColorStudio), which informed the colour work.
-
----
-
-## Star History
-
-<a href="https://www.star-history.com/?repos=jiafeimiao-k-cat%2Fdiscimagestudio&type=date&legend=top-left">
- <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=jiafeimiao-k-cat/discimagestudio&type=date&theme=dark&legend=top-left" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=jiafeimiao-k-cat/discimagestudio&type=date&legend=top-left" />
-   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=jiafeimiao-k-cat/discimagestudio&type=date&legend=top-left" />
- </picture>
-</a>

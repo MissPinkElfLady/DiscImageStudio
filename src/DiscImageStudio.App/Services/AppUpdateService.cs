@@ -44,7 +44,7 @@ internal sealed record AppUpdateCheck(
 /// with an upstream build that lacks its features; other builds must be updated manually.</summary>
 internal sealed class AppUpdateService
 {
-    internal const string OfficialRepository = "MissPinkElfLady/DiscImageStudio";
+    internal const string OfficialRepository = "MissPinkElfLady/DiscImageStudio-Chroma";
     internal const string RepositoryUrl = "https://github.com/" + OfficialRepository;
     internal const string ManifestUrl = RepositoryUrl + "/releases/latest/download/latest.json";
     internal const string HealthVariable = "DIS_UPDATE_HEALTH_FILE";

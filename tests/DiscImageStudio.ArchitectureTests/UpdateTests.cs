@@ -109,7 +109,7 @@ internal static class UpdateTests
         Reject(BuildManifest(runtimeIdentifier: "win-arm64"), current, "win-x64", "未找到更新信息。");
         Reject("not json", current, "win-x64", "更新信息无效。");
         Reject(BuildManifest(tag: "v1.6.1"), current, "win-x64", "更新信息无效。");
-        Reject(BuildManifest(url: "http://github.com/MissPinkElfLady/DiscImageStudio/releases/download/v1.6.0/file.exe"),
+        Reject(BuildManifest(url: "http://github.com/MissPinkElfLady/DiscImageStudio-Chroma/releases/download/v1.6.0/file.exe"),
             current, "win-x64", "更新信息无效。");
         Reject(BuildManifest(url: "https://example.com/DiscImageStudio.exe"),
             current, "win-x64", "更新信息无效。");
@@ -117,11 +117,11 @@ internal static class UpdateTests
             current, "win-x64", "更新信息无效。");
         Reject(BuildManifest(url: AssetUrl() + "?download=1"), current, "win-x64", "更新信息无效。");
         Reject(BuildManifest(url: AssetUrl() + "#fragment"), current, "win-x64", "更新信息无效。");
-        Reject(BuildManifest(url: "https://github.com.evil.example/MissPinkElfLady/DiscImageStudio/releases/download/v1.6.0/file.exe"),
+        Reject(BuildManifest(url: "https://github.com.evil.example/MissPinkElfLady/DiscImageStudio-Chroma/releases/download/v1.6.0/file.exe"),
             current, "win-x64", "更新信息无效。");
-        Reject(BuildManifest(url: "https://github.com@example.com/MissPinkElfLady/DiscImageStudio/releases/download/v1.6.0/file.exe"),
+        Reject(BuildManifest(url: "https://github.com@example.com/MissPinkElfLady/DiscImageStudio-Chroma/releases/download/v1.6.0/file.exe"),
             current, "win-x64", "更新信息无效。");
-        Reject(BuildManifest(url: "https://github.com:444/MissPinkElfLady/DiscImageStudio/releases/download/v1.6.0/file.exe"),
+        Reject(BuildManifest(url: "https://github.com:444/MissPinkElfLady/DiscImageStudio-Chroma/releases/download/v1.6.0/file.exe"),
             current, "win-x64", "更新信息无效。");
         Reject(BuildManifest(sha256: "abc"), current, "win-x64", "更新信息无效。");
         Reject(BuildManifest(sha256: new string('g', 64)), current, "win-x64", "更新信息无效。");
@@ -554,7 +554,7 @@ internal static class UpdateTests
           {
             "version": "{{version}}",
             "tag": "{{tag}}",
-            "notesUrl": "https://github.com/MissPinkElfLady/DiscImageStudio/releases/tag/{{tag}}",
+            "notesUrl": "https://github.com/MissPinkElfLady/DiscImageStudio-Chroma/releases/tag/{{tag}}",
             "assets": {
               "{{runtimeIdentifier}}": {
                 "url": "{{url ?? AssetUrl(version)}}",
@@ -566,7 +566,7 @@ internal static class UpdateTests
           """;
 
     private static string AssetUrl(string version = "1.6.0") =>
-        "https://github.com/MissPinkElfLady/DiscImageStudio/releases/download/v" + version
+        "https://github.com/MissPinkElfLady/DiscImageStudio-Chroma/releases/download/v" + version
         + "/DiscImageStudio-v" + version + "-win-x64.exe";
 
     private static AppVersion Version(string text)
