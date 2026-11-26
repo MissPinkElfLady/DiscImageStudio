@@ -726,7 +726,8 @@ public partial class DesignView : UserControl
             double toneChrome = ToneCard.Padding.Top + ToneCard.Padding.Bottom
                 + ToneCard.BorderThickness.Top + ToneCard.BorderThickness.Bottom;
             ToneRail.RailHeightBudget = RightRailScroll.ViewportHeight
-                - PropsCard.ActualHeight - ToneCard.Margin.Top - toneChrome;
+                - PropsCard.ActualHeight - ToneCard.Margin.Top - toneChrome
+                - (ColorModeGate.Visibility == Visibility.Visible ? ColorModeGate.ActualHeight : 0);
         }
         else
         {

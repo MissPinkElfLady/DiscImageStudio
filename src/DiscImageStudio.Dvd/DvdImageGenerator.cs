@@ -58,6 +58,52 @@ public static class DvdImageGenerator
         return summary;
     }
 
+    /// <summary>
+    /// Writes the design as one colour diffraction picture over the whole disc, with the same geometry sidecar as a
+    /// greyscale image. Colour pictures fill every sector, so a data directory cannot be added.
+    /// </summary>
+    public static DiscImageResult GenerateColor(DvdImageRequest request,
+        IProgress<DiscJobProgress>? progress = null, CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(request);
+        cancellationToken.ThrowIfCancellationRequested();
+        ArgumentException.ThrowIfNullOrWhiteSpace(request.SourceImage);
+        ArgumentException.ThrowIfNullOrWhiteSpace(request.OutputPath);
+        ArgumentNullException.ThrowIfNull(request.Options);
+        if (!string.IsNullOrWhiteSpace(request.DataDirectory) || request.FilesAtOuterRing)
+            throw new ArgumentException("Colour pictures cannot include files yet.", nameof(request));
+        DvdStreamingOptions options = request.Options with { ReadCompatibility = false };
+        options.Validate();
+        string outputPath = Path.GetFullPath(request.OutputPath);
+        progress?.Report(new("dvd", "prepare", "Preparing colour picture…"));
+        DvdStreamingSummary summary;
+        using (FileStream output = new(outputPath, FileMode.Create, FileAccess.Write, FileShare.None, 1 << 20))
+        {
+            summary = DvdStreamingGenerator.GenerateColor(request.SourceImage, output, options, value => progress?.Report(new(
+                "dvd", "generate", $"Generating colour DVD image: {value.CompletedBlocks}/{value.TotalBlocks} blocks",
+                value.Fraction, value.CompletedBytes, value.TotalBytes, value.Elapsed)), cancellationToken);
+        }
+
+        cancellationToken.ThrowIfCancellationRequested();
+        var metadata = new
+        {
+            format = "dvd-diffraction-colour-v1",
+            sourceImage = summary.SourceImage,
+            startLba = 0,
+            fillSectors = options.OutputSectors,
+            totalSectors = options.TotalSectors,
+            imageMapping = DvdStreamingGenerator.CreateSolveOptions(options, 0, options.OutputSectors).ImageMapping,
+        };
+        File.WriteAllText(outputPath + ".json", JsonSerializer.Serialize(metadata, new JsonSerializerOptions
+        {
+            WriteIndented = true,
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+        }));
+        string text = $"Colour DVD image completed: {summary.Sectors} sectors.";
+        progress?.Report(new("dvd", "complete", text, 1, summary.BytesWritten, summary.BytesWritten, summary.Elapsed));
+        return new DiscImageResult(outputPath, text);
+    }
+
     public static DiscImageResult Generate(DvdImageRequest request,
         IProgress<DiscJobProgress>? progress = null, CancellationToken cancellationToken = default)
     {

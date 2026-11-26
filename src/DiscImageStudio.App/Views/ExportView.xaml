@@ -85,8 +85,18 @@
                             <TextBox Text="{Binding State.DvdVolumeLabel, UpdateSourceTrigger=PropertyChanged}" MaxLength="16" />
                             <TextBlock Style="{StaticResource HintText}" Margin="0,4,0,0"
                                        Text="{loc:Text Xaml.VolumeLabelHint}" />
-                            <controls:DvdReadCompatibilityToggle IsChecked="{Binding State.DvdReadCompatibility}"
-                                                                 Mode="{Binding State.DvdReadCompatibilityMode}" Margin="0,14,0,0" />
+                            <TextBlock Style="{StaticResource FieldLabel}" Margin="0,14,0,6" Text="{loc:Text DvdColor.Label}" />
+                            <controls:SegmentedControl LabelA="{loc:Text DvdColor.Greyscale}"
+                                                       LabelB="{loc:Text DvdColor.Colour}"
+                                                       IsSecondSelected="{Binding State.DvdColor}" />
+                            <controls:VisibilityGate IsOpen="{Binding State.DvdColor}">
+                                <TextBlock Style="{StaticResource HintText}" Margin="0,8,0,0"
+                                           TextWrapping="Wrap" Text="{loc:Text DvdColor.Hint}" />
+                            </controls:VisibilityGate>
+                            <controls:VisibilityGate IsOpen="{Binding State.DvdGreyscale}">
+                                <controls:DvdReadCompatibilityToggle IsChecked="{Binding State.DvdReadCompatibility}"
+                                                                     Mode="{Binding State.DvdReadCompatibilityMode}" Margin="0,14,0,0" />
+                            </controls:VisibilityGate>
                         </StackPanel>
                     </controls:VisibilityGate>
 

@@ -121,7 +121,8 @@ public partial class BurnViewModel : ObservableObject
         _state.PropertyChanged += (_, args) =>
         {
             if (!UseCalibrationPattern && args.PropertyName is
-                nameof(DiscParametersState.DvdReadCompatibility) or nameof(DiscParametersState.DvdReadCompatibilityMode))
+                nameof(DiscParametersState.DvdReadCompatibility) or nameof(DiscParametersState.DvdReadCompatibilityMode)
+                or nameof(DiscParametersState.DvdColor))
             {
                 OnPropertyChanged(args.PropertyName);
                 UpdateSourceSummary();
@@ -320,7 +321,7 @@ public partial class BurnViewModel : ObservableObject
                 _state.DvdInnerRadius, _state.DvdOuterRadius,
                 _state.DvdPitchLinear, _state.DvdPitchQuadratic, _state.DvdPitchCubic,
                 _state.DvdDataDirectory, _state.DvdVolumeLabel, _state.DvdFilesAtOuterRing, _state.DvdOuterRingBleed, _state.DvdReadCompatibility,
-                _state.DvdReadCompatibilityMode,
+                _state.DvdReadCompatibilityMode, _state.DvdColor,
                 _state.ToneDitherStrength, _state.ToneBrightness, _state.ToneSrgbLinearization);
         }
         else if (IsBluRayBurn)
@@ -658,6 +659,8 @@ public partial class BurnViewModel : ObservableObject
                         UsableSectors = checked((uint)StreamBurnCapacity.Resolve(options.OutputSectors, capacity.WritableSectors, mediaKind)),
                     };
                     string dataDirectory = _state.DvdDataDirectory.Trim();
+                    bool color = _state.DvdColor;
+                    if (color && dataDirectory.Length != 0) throw new ArgumentException(L.T("DvdColor.NoFiles"));
                     DvdHybridStreamingPlan? hybridPlan = dataDirectory.Length == 0
                         ? null
                         : DvdStreamingGenerator.PrepareHybrid(
@@ -671,7 +674,15 @@ public partial class BurnViewModel : ObservableObject
                         options.ContentLength,
                         (output, cancellationToken) =>
                         {
-                            if (hybridPlan is null)
+                            if (color)
+                            {
+                                DvdStreamingGenerator.GenerateColor(
+                                    compositePath,
+                                    output,
+                                    options,
+                                    cancellationToken: cancellationToken);
+                            }
+                            else if (hybridPlan is null)
                             {
                                 DvdStreamingGenerator.Generate(
                                     compositePath,
@@ -691,7 +702,9 @@ public partial class BurnViewModel : ObservableObject
                         },
                         selectedWriteSpeed.Speed,
                         OverwriteRewritableMedia: AllowRewritableOverwrite);
-                    contentDescription = hybridPlan is null
+                    contentDescription = color
+                        ? L.Format("DvdColor.BurnContent", options.OutputSectors, options.ContentLength / (1024.0 * 1024.0))
+                        : hybridPlan is null
                         ? L.F($"DVD · {options.OutputSectors} 扇区 · {options.ContentLength / (1024.0 * 1024.0):F1} MiB")
                         : L.F($"DVD 混合盘 · {hybridPlan.FileCount} 个文件（{(_state.DvdFilesAtOuterRing ? L.T("外圈") : L.T("内圈"))}）")
                             + L.F($" · 绘图 LBA {hybridPlan.DrawingStartLba}–{hybridPlan.DrawingEndLbaExclusive - 1}")

@@ -256,6 +256,16 @@ public partial class ExportViewModel : ObservableObject
         DvdImageRequest request = new(compositePath, output, options, _state.DvdDataDirectory.Trim(),
             _state.ResolveVolumeLabel(OpticalDiscFamily.Dvd),
             !string.IsNullOrWhiteSpace(_state.DvdDataDirectory) && _state.DvdFilesAtOuterRing);
+        if (_state.DvdColor)
+        {
+            if (_state.HasDvdFiles) throw new ArgumentException(L.T("DvdColor.NoFiles"));
+            if (await _shell.RunImageJobAsync(L.T("DvdColor.Generating"), output,
+                    (progress, token) => DvdImageGenerator.GenerateColor(request, progress, token),
+                    "colour " + request))
+                _state.DvdIsoPath = output;
+            return;
+        }
+
         if (await _shell.RunImageJobAsync(L.T("正在生成 DVD ISO…"), output,
                 (progress, token) => DvdImageGenerator.Generate(request, progress, token), request.ToString()))
             _state.DvdIsoPath = output;

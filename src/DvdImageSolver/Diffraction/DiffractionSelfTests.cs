@@ -68,6 +68,7 @@ internal static class DiffractionSelfTests
         TestColor("colour, two copies", TwoCopies, 2);
         TestColor("colour, one copy", OneCopy, 1);
         TestWideColor();
+        TestColorDisc();
     }
 
     // make_color_vectors.py (--copies 2 and --copies 1): DiscDiffractStudio's colour flip of the channels below
@@ -249,6 +250,41 @@ internal static class DiffractionSelfTests
             "a colour picture at 12 o'clock is fine with the lamp to the side");
         Check(Throws(() => DiffractionColor.Build("x", (0.0, 43.0), (24.0, 24.0), small, small, small, cellMm: Cell)),
             "a colour picture at 12 o'clock is refused with the lamp above");
+    }
+
+    // The app's colour mode: the picture lands where the greyscale writer would put the same image (start angle 0 at
+    // 3 o'clock, data clockwise, image y down). Only the image's top-right quadrant is opaque.
+    private static void TestColorDisc()
+    {
+        DvdTrackGeometry geometry = ParityGeometry();
+        const int Size = 236;
+        byte[] pixels = new byte[Size * Size * 4];
+        for (int y = 0; y < Size / 2; y++)
+            for (int x = Size / 2; x < Size; x++)
+                pixels.AsSpan((y * Size + x) * 4, 4).Fill(255);
+        string path = Path.Combine(Path.GetTempPath(), $"dis-colour-selftest-{Guid.NewGuid():N}.png");
+        try
+        {
+            DiscImageStudio.ImageIO.RasterCodec.SavePng(path, Size, Size, pixels, grayscale: false);
+            var (r, g, b) = DiffractionImages.LinearRgbCellsBinned(path, 118, 118);
+            Check(Math.Abs(r[10, 100] - 1) < 1e-12 && r[10, 10] == 0 && r[100, 100] == 0 && g[58, 59] == 1 && b[59, 58] == 0 && b[58, 58] == 0,
+                "colour disc: binned cells keep the quadrant");
+            Solver.ImageMappingOptions mapping = new(2_297_888, geometry.InnerRadiusMm, geometry.OuterRadiusMm, 133.3,
+                StartAngleDegrees: 0, Clockwise: true, LuminanceThreshold: 128, AlphaThreshold: 1,
+                PitchLinear: -3.5014145371817896e-05, PitchQuadratic: 4.087772214354072e-05,
+                PitchCubic: -1.5829613261263454e-05, ImageOuterRadiusMm: 59.0);
+            DiffractionLayout layout = DiffractionColorDisc.BuildLayout(path, mapping);
+            // Greyscale: polar angle = start - track angle, so the top-right quadrant (polar 0..90 degrees) is track
+            // angles 270..360 degrees.
+            double Turn(double degrees) => 200 * Math.PI + degrees * Math.PI / 180;
+            Check(layout.CodeAt(40, Turn(315)) != layout.OffByte, "colour disc: the top-right quadrant is written");
+            foreach (double other in new[] { 45.0, 135.0, 225.0 })
+                Check(layout.CodeAt(40, Turn(other)) == layout.OffByte, $"colour disc: track angle {other} is background");
+        }
+        finally
+        {
+            File.Delete(path);
+        }
     }
 
     private static bool Throws(Action action)
