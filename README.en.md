@@ -25,7 +25,7 @@ Disc Image Studio is a multi-platform disc-surface image generation and burning 
 
 ## About this fork
 
-This is [MissPinkElfLady/DiscImageStudio-Chroma](https://github.com/MissPinkElfLady/DiscImageStudio-Chroma), Bronya's fork of [Disc Image Studio](https://github.com/JiaFeiMiao-K-Cat/DiscImageStudio) by JiaFeiMiao-K-Cat and contributors. It adds **diffraction-grating pictures for DVD-R**, including **colour pictures**. Everything else is upstream Disc Image Studio. The fork is not affiliated with or endorsed by the upstream project or by the authors of the projects credited below.
+This is [MissPinkElfLady/DiscImageStudio-Chroma](https://github.com/MissPinkElfLady/DiscImageStudio-Chroma), MissPinkElfLady's fork of [Disc Image Studio](https://github.com/JiaFeiMiao-K-Cat/DiscImageStudio) by JiaFeiMiao-K-Cat and contributors. It adds **diffraction-grating pictures for DVD-R**, including **colour pictures**. Everything else is upstream Disc Image Studio. The fork is not affiliated with or endorsed by the upstream project or by the authors of the projects credited below.
 
 **Download:** ready-to-run builds of this fork are on its [Releases page](https://github.com/MissPinkElfLady/DiscImageStudio-Chroma/releases): `win-x64.exe` for Windows x64, `win-arm64.exe` for Windows 11 ARM64, and experimental CLI archives for Linux and macOS. The Quick Start links below point to upstream builds, which do not have the colour features.
 
@@ -67,7 +67,7 @@ Details: [docs/DIFFRACTION.md](docs/DIFFRACTION.md), [CHANGELOG.md](CHANGELOG.md
 
 ### AI-generated code
 
-All of the fork's additions were written by AI: Anthropic's Claude, working in Claude Code. That covers the code, tests, parity scripts, documentation and this section. Bronya directed the work, tested the builds and burned discs. The code was not written by hand. Commits made this way carry a `Co-Authored-By: Claude` trailer. Upstream Disc Image Studio and DiscDiffractStudio belong to their own authors; DiscDiffractStudio's README states that it was itself created entirely by AI.
+All of the fork's additions were written by AI: Anthropic's Claude, working in Claude Code. That covers the code, tests, parity scripts, documentation and this section. MissPinkElfLady directed the work, tested the builds and burned discs. The code was not written by hand. Commits made this way carry a `Co-Authored-By: Claude` trailer. Upstream Disc Image Studio and DiscDiffractStudio belong to their own authors; DiscDiffractStudio's README states that it was itself created entirely by AI.
 
 ### Licence
 
