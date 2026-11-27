@@ -64,7 +64,7 @@ function Set-UpdateFixture {
             continue
         }
         $content = [byte[]](1..(16 + $rid.Length))
-        [IO.File]::WriteAllBytes((Join-Path $release "DiscImageStudio-$Tag-$rid.exe"), $content)
+        [IO.File]::WriteAllBytes((Join-Path $release "DiscImageStudio-Chroma-$Tag-$rid.exe"), $content)
     }
     return $release
 }
@@ -271,11 +271,11 @@ try {
                 if ($null -eq $asset) {
                     throw "Manifest is missing the $rid asset."
                 }
-                Assert-Equal $asset.url "https://github.com/example/DiscImageStudio/releases/download/$tag/DiscImageStudio-$tag-$rid.exe" "$rid asset url"
+                Assert-Equal $asset.url "https://github.com/example/DiscImageStudio/releases/download/$tag/DiscImageStudio-Chroma-$tag-$rid.exe" "$rid asset url"
                 if ($asset.sha256 -cnotmatch '^[0-9a-f]{64}$') {
                     throw "$rid asset sha256 is not lowercase hexadecimal: $($asset.sha256)"
                 }
-                $package = Join-Path $release "DiscImageStudio-$tag-$rid.exe"
+                $package = Join-Path $release "DiscImageStudio-Chroma-$tag-$rid.exe"
                 Assert-Equal $asset.sha256 (Get-FileHash -LiteralPath $package -Algorithm SHA256).Hash.ToLowerInvariant() "$rid asset sha256"
                 Assert-Equal ([long]$asset.size) ([long](Get-Item -LiteralPath $package).Length) "$rid asset size"
             }
@@ -289,7 +289,7 @@ try {
 
     Invoke-Test "reject update manifest for an empty package" {
         $release = Set-UpdateFixture
-        $package = Join-Path $release "DiscImageStudio-v1.2.3-win-x64.exe"
+        $package = Join-Path $release "DiscImageStudio-Chroma-v1.2.3-win-x64.exe"
         [IO.File]::WriteAllBytes($package, [byte[]]::new(0))
         Assert-Rejected { & $fixtureManifestHelper -ReleaseDirectory $release -Tag "v1.2.3" -Repository "example/DiscImageStudio" } "Tested package is empty"
     }

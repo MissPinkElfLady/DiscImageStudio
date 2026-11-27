@@ -14,7 +14,7 @@
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
             <Image Grid.Column="0" Source="{StaticResource AppIconSource}" Width="16" Height="16" Margin="0,0,8,0" />
-            <TextBlock Grid.Column="1" Text="Disc Image Studio" FontSize="12"
+            <TextBlock Grid.Column="1" Text="Disc Image Studio Chroma" FontSize="12"
                        Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center" />
             <TextBlock x:Name="ProjectTitleText" Grid.Column="2" FontSize="12" Margin="8,0,0,0" Visibility="Collapsed"
                        TextTrimming="CharacterEllipsis"

@@ -2,11 +2,11 @@
 
 [简体中文](README.md) | [繁體中文](README.zh-TW.md) | [English](README.en.md) | [日本語](README.ja.md) | [Türkçe](README.tr.md) | [Español](README.es.md) | [Čeština](README.cs.md) | **Português (Brasil)**
 
-![Banner](docs/images/DiscImageStudio_Banner_2.png)
+![Banner](docs/images/DIS-C.png)
 
 <h2>Uma ferramenta completa para gerar e gravar imagens visíveis em discos ópticos</h2>
 
-O Disc Image Studio é uma ferramenta multiplataforma de geração e gravação de imagens na superfície de discos que permite gravar imagens visíveis a olho nu em DVDs, CDs e discos Blu-ray de camada única compatíveis.
+O Disc Image Studio Chroma é uma ferramenta multiplataforma de geração e gravação de imagens na superfície de discos que permite gravar imagens visíveis a olho nu em DVDs, CDs e discos Blu-ray de camada única compatíveis.
 
 ![Versão do .NET](https://img.shields.io/badge/.NET-10.0-512bd4?style=flat-square)
 ![Plataforma](https://img.shields.io/badge/Platform-Windows%20%7C%20Linux%20%7C%20macOS-0078d6?style=flat-square)

@@ -122,7 +122,7 @@ public static class ProjectJsonStore
     public const int CurrentSchemaVersion = 2;
     private const int LegacySchemaVersion = 1;
     public const string FileExtension = ".discproj";
-    public const string FileFilter = "Disc Image Studio 工程|*.discproj";
+    public const string FileFilter = "Disc Image Studio Chroma 工程|*.discproj";
 
     // 256px PNG of a photographic design stays under ~200K base64 chars; the cap keeps a
     // pathological file from bloating the project JSON.

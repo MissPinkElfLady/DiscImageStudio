@@ -73,12 +73,12 @@ Windows 应用宿主设置 `CetCompat=false`，用于绕过 #229 所报的受影
 Linux 与 macOS 的实验性离线 CLI 在各自的 x64、Arm64 runner 上构建，发布包自带 .NET 运行时。每个 runner 解开刚生成的 tar.gz，在仓库目录外运行 `--help`、DVD 自检以及 CD 音轨、DVD 镜像和蓝光镜像生成测试。发布流程收集通过这些测试的四个原始压缩包，以及 Windows 矩阵已检查的两个原始 EXE；不会另行重建 EXE。每份制品均核对其相邻的 SHA-256 sidecar 后再汇集到同一个发布目录。附件命名如下（`A.B.C` 替换为实际版本，预发布还包括后缀）：
 
 ```text
-DiscImageStudio-vA.B.C-win-x64.exe
-DiscImageStudio-vA.B.C-win-arm64.exe
-DiscImageStudio-CLI-vA.B.C-linux-x64.tar.gz
-DiscImageStudio-CLI-vA.B.C-linux-arm64.tar.gz
-DiscImageStudio-CLI-vA.B.C-osx-x64.tar.gz
-DiscImageStudio-CLI-vA.B.C-osx-arm64.tar.gz
+DiscImageStudio-Chroma-vA.B.C-win-x64.exe
+DiscImageStudio-Chroma-vA.B.C-win-arm64.exe
+DiscImageStudio-Chroma-CLI-vA.B.C-linux-x64.tar.gz
+DiscImageStudio-Chroma-CLI-vA.B.C-linux-arm64.tar.gz
+DiscImageStudio-Chroma-CLI-vA.B.C-osx-x64.tar.gz
+DiscImageStudio-Chroma-CLI-vA.B.C-osx-arm64.tar.gz
 SHA256SUMS.txt
 latest.json
 ```
@@ -88,7 +88,7 @@ latest.json
 维护者在 GitHub 的 [Releases 页面](https://github.com/MissPinkElfLady/DiscImageStudio-Chroma/releases) 检查草稿中的版本、发布说明、各平台附件和校验值，并下载验证启动后，再手动公开。可用下列命令计算 Windows 下载文件的 SHA-256，与 Release 说明中的值比较：
 
 ```powershell
-Get-FileHash .\DiscImageStudio-vA.B.C-win-x64.exe -Algorithm SHA256
+Get-FileHash .\DiscImageStudio-Chroma-vA.B.C-win-x64.exe -Algorithm SHA256
 ```
 
 ## 应用内更新
@@ -180,9 +180,9 @@ powershell -ExecutionPolicy Bypass -File packaging/Install-TestPackage.ps1
 ```powershell
 powershell -ExecutionPolicy Bypass -File packaging/Build-MSIX.ps1 `
   -IdentityName "12345.DiscImageStudioArchitectureTest" `
-  -Publisher "CN=Disc Image Studio Test" `
-  -PublisherDisplayName "Disc Image Studio Test" `
-  -DisplayName "Disc Image Studio Test" `
+  -Publisher "CN=Disc Image Studio Chroma Test" `
+  -PublisherDisplayName "Disc Image Studio Chroma Test" `
+  -DisplayName "Disc Image Studio Chroma Test" `
   -Version "1.0.26.0" `
   -UnsignedDevelopmentPackage
 ```

@@ -234,13 +234,13 @@
     "cs": "O aplikaci"
   },
   "Xaml.DiscImageStudioIsAnAllInOneWorkspace": {
-    "zh-CN": "Disc Image Studio是帮助您在光盘表面印刷图案的一站式工作台。",
-    "en": "Disc Image Studio is an all-in-one workspace for creating visible artwork on optical discs.",
-    "zh-TW": "Disc Image Studio 是協助您在光碟表面製作圖案的整合工作台。",
-    "ja": "Disc Image Studio は、ディスクの記録面に図柄を描き出すためのオールインワン ワークスペースです。",
-    "tr": "Disc Image Studio, optik diskler üzerinde görünür görsel sanat eserleri oluşturmak için hepsi bir arada bir çalışma alanıdır.",
-    "es": "Disc Image Studio reúne en un único espacio de trabajo las herramientas para crear dibujos visibles en discos ópticos.",
-    "cs": "Disc Image Studio je ucelený nástroj pro tvorbu viditelných obrázků na optických discích."
+    "zh-CN": "Disc Image Studio Chroma是帮助您在光盘表面印刷图案的一站式工作台。",
+    "en": "Disc Image Studio Chroma is an all-in-one workspace for creating visible artwork on optical discs.",
+    "zh-TW": "Disc Image Studio Chroma 是協助您在光碟表面製作圖案的整合工作台。",
+    "ja": "Disc Image Studio Chroma は、ディスクの記録面に図柄を描き出すためのオールインワン ワークスペースです。",
+    "tr": "Disc Image Studio Chroma, optik diskler üzerinde görünür görsel sanat eserleri oluşturmak için hepsi bir arada bir çalışma alanıdır.",
+    "es": "Disc Image Studio Chroma reúne en un único espacio de trabajo las herramientas para crear dibujos visibles en discos ópticos.",
+    "cs": "Disc Image Studio Chroma je ucelený nástroj pro tvorbu viditelných obrázků na optických discích."
   },
   "Xaml.ReleasedUnderTheGNUGeneralPublicLicenseV30": {
     "zh-CN": "本项目以 GNU General Public License v3.0 or later 发布；重新分发须随附对应源代码并保留第三方声明。",

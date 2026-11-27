@@ -2,11 +2,11 @@
 
 [简体中文](README.md) | **繁體中文** | [English](README.en.md) | [日本語](README.ja.md) | [Türkçe](README.tr.md) | [Español](README.es.md) | [Čeština](README.cs.md) | [Português (Brasil)](README.pt-BR.md)
 
-![Banner](docs/images/DiscImageStudio_Banner_2.png)
+![Banner](docs/images/DIS-C.png)
 
 <h2>全功能光碟表面可見圖像製作與燒錄工具</h2>
 
-Disc Image Studio 是一個多平台的光碟表面圖像產生與燒錄工具，協助您使用任何燒錄光碟機，在任何 DVD / CD / 單層藍光 光碟上燒錄出肉眼可見的圖像。
+Disc Image Studio Chroma 是一個多平台的光碟表面圖像產生與燒錄工具，協助您使用任何燒錄光碟機，在任何 DVD / CD / 單層藍光 光碟上燒錄出肉眼可見的圖像。
 
 ![.NET 版本](https://img.shields.io/badge/.NET-10.0-512bd4?style=flat-square)
 ![執行平台](https://img.shields.io/badge/Platform-Windows%20%7C%20Linux%20%7C%20macOS-0078d6?style=flat-square)

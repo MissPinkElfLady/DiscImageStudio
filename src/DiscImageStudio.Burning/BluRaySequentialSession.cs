@@ -62,7 +62,7 @@ internal sealed class DynamicBluRaySequentialSession : IBluRaySequentialSession,
         _transport = new ImapiMmcCommandTransport(recorder);
         _commands = new BluRayMmcCommands(_transport, reportRecordedLba);
         _cleanup = new BluRaySessionCleanup(
-            acquireExclusive: () => _recorder.AcquireExclusiveAccess(false, "Disc Image Studio"),
+            acquireExclusive: () => _recorder.AcquireExclusiveAccess(false, "Disc Image Studio Chroma"),
             disableMcn: () => _recorder.DisableMcn(),
             preventRemoval: () => _commands.PreventRemoval(true),
             allowRemoval: () => _commands.PreventRemoval(false),

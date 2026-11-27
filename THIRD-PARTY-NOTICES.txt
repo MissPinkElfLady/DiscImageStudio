@@ -1,7 +1,7 @@
-Disc Image Studio - Third-party notices
+Disc Image Studio Chroma - Third-party notices
 ======================================
 
-Disc Image Studio source code is licensed under GNU GPL version 3 or (at your option) any later version (SPDX: GPL-3.0-or-later); see LICENSE.
+Disc Image Studio Chroma source code is licensed under GNU GPL version 3 or (at your option) any later version (SPDX: GPL-3.0-or-later); see LICENSE.
 The components below retain their own copyrights and license terms. The
 project license does not replace or relicense these components.
 

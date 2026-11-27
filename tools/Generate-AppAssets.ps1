@@ -81,7 +81,7 @@ function New-LogoPng([int]$Width, [int]$Height, [string]$FileName, [bool]$Includ
         $titleBrush = [Drawing.SolidBrush]::new([Drawing.Color]::White)
         $subtitleBrush = [Drawing.SolidBrush]::new([Drawing.Color]::FromArgb(210, 224, 230, 255))
         $textX = $Height * 0.98
-        $graphics.DrawString("Disc Image Studio", $titleFont, $titleBrush, [float]$textX, [float]($Height * 0.31))
+        $graphics.DrawString("Disc Image Studio Chroma", $titleFont, $titleBrush, [float]$textX, [float]($Height * 0.31))
         $graphics.DrawString("Optical art · CD / DVD", $subtitleFont, $subtitleBrush, [float]$textX, [float]($Height * 0.55))
         $titleFont.Dispose()
         $subtitleFont.Dispose()

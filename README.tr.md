@@ -2,11 +2,11 @@
 
 [简体中文](README.md) | [繁體中文](README.zh-TW.md) | [English](README.en.md) | [日本語](README.ja.md) | **Türkçe** | [Español](README.es.md) | [Čeština](README.cs.md) | [Português (Brasil)](README.pt-BR.md)
 
-![Banner](docs/images/DiscImageStudio_Banner_2.png)
+![Banner](docs/images/DIS-C.png)
 
 <h2>Optik disklere görünür görüntüler oluşturmak ve yazmak için hepsi bir arada araç</h2>
 
-Disc Image Studio, herhangi bir kayıt sürücüsüyle herhangi bir DVD / CD / tek katmanlı Blu-ray disk üzerine çıplak gözle görülebilen görüntüler işlemenize yardımcı olan, çok platformlu bir disk yüzeyi görüntüsü oluşturma ve yazma aracıdır.
+Disc Image Studio Chroma, herhangi bir kayıt sürücüsüyle herhangi bir DVD / CD / tek katmanlı Blu-ray disk üzerine çıplak gözle görülebilen görüntüler işlemenize yardımcı olan, çok platformlu bir disk yüzeyi görüntüsü oluşturma ve yazma aracıdır.
 
 ![.NET version](https://img.shields.io/badge/.NET-10.0-512bd4?style=flat-square)
 ![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20Linux%20%7C%20macOS-0078d6?style=flat-square)
