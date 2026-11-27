@@ -34,9 +34,17 @@ internal sealed class DiffractionLayout
 
     [ThreadStatic] private static int[]? t_codes;
     [ThreadStatic] private static bool[]? t_fromString;
+    [ThreadStatic] private static double[]? t_phases;
+
+    /// <summary>Extra filler bytes a phase-locked string piece may be delayed by to land on its target phase.</summary>
+    internal const int MaxPhaseDelayBytes = 16;
 
     private readonly byte[][] _stringData;
     private readonly short[][] _stringTrim;
+    private readonly double[] _stringPeriod;
+    private readonly Func<double, double, int>? _codeAt;
+    private readonly Func<double, double, int, double>? _phaseAt;
+    private readonly double _outerRadius;
     private readonly DvdTrackGeometry _geometry;
     private readonly double _bitMm;
     private readonly (double Centre, double Half, double RMin, double RMax)[] _sectors;
@@ -71,14 +79,8 @@ internal sealed class DiffractionLayout
         Groups = [.. groups];
         _stringData = new byte[groups.Count * CarrierGroup.Variants][];
         _stringTrim = new short[groups.Count * CarrierGroup.Variants][];
-        for (int g = 0; g < groups.Count; g++)
-        {
-            for (int w = 0; w < groups[g].Strings.Length; w++)
-            {
-                _stringData[g * CarrierGroup.Variants + w] = groups[g].Strings[w].Data;
-                _stringTrim[g * CarrierGroup.Variants + w] = groups[g].Strings[w].Trim;
-            }
-        }
+        _stringPeriod = new double[groups.Count * CarrierGroup.Variants];
+        FillStringTables(groups, _stringData, _stringTrim, _stringPeriod);
 
         const double margin = 0.1;
         _sectors = new (double, double, double, double)[Pictures.Length];
@@ -86,6 +88,49 @@ internal sealed class DiffractionLayout
         {
             var (rMin, rMax, phi, half) = Pictures[k].PolarSpan();
             _sectors[k] = (ThetaRef + phi, Math.Min(Math.PI, half + margin / Math.Max(rMin, 1.0)), rMin - margin, rMax + margin);
+        }
+    }
+
+    /// <summary>
+    /// A layout without pictures: <paramref name="codeAt"/> gives the code of every payload byte from its radius and
+    /// unwrapped spiral angle (string carrier g of <paramref name="groups"/> is code 256 + 256 g + variant), between
+    /// <paramref name="innerRadiusMm"/> and <paramref name="outerRadiusMm"/>. <paramref name="phaseAt"/>, when given,
+    /// phase-locks string pieces: it returns the phase (in cycles) the grating should have at a byte, or NaN for none.
+    /// A locked piece is delayed by up to <see cref="MaxPhaseDelayBytes"/> filler bytes so that its string starts
+    /// where that phase is nearest a whole number, which lets neighbouring turns carry a grating with a chosen slant.
+    /// </summary>
+    internal DiffractionLayout(IReadOnlyList<CarrierGroup> groups, Func<double, double, int> codeAt,
+        Func<double, double, int, double>? phaseAt, double innerRadiusMm, double outerRadiusMm,
+        DvdTrackGeometry geometry, double channelBitLengthNm = 133.3)
+    {
+        if (groups.Count == 0) throw new ArgumentException("A ring layout needs at least one carrier string.");
+        Pictures = [];
+        OffByte = StringCarrier.Filler;
+        ThetaRef = 0;
+        _geometry = geometry;
+        _bitMm = channelBitLengthNm * 1e-6;
+        _codeAt = codeAt;
+        _phaseAt = phaseAt;
+        _outerRadius = outerRadiusMm;
+        Bridges = [];
+        Groups = [.. groups];
+        _stringData = new byte[groups.Count * CarrierGroup.Variants][];
+        _stringTrim = new short[groups.Count * CarrierGroup.Variants][];
+        _stringPeriod = new double[groups.Count * CarrierGroup.Variants];
+        FillStringTables(groups, _stringData, _stringTrim, _stringPeriod);
+        _sectors = [(0.0, Math.PI, innerRadiusMm - 0.1, outerRadiusMm + 0.1)];
+    }
+
+    private static void FillStringTables(IReadOnlyList<CarrierGroup> groups, byte[][] data, short[][] trim, double[] period)
+    {
+        for (int g = 0; g < groups.Count; g++)
+        {
+            for (int w = 0; w < groups[g].Strings.Length; w++)
+            {
+                data[g * CarrierGroup.Variants + w] = groups[g].Strings[w].Data;
+                trim[g * CarrierGroup.Variants + w] = groups[g].Strings[w].Trim;
+                period[g * CarrierGroup.Variants + w] = groups[g].Strings[w].PeriodBits;
+            }
         }
     }
 
@@ -114,6 +159,7 @@ internal sealed class DiffractionLayout
     /// <summary>Code (a byte, or a string code) for a payload byte centred at radius r and unwrapped spiral angle theta.</summary>
     internal int CodeAt(double r, double theta)
     {
+        if (_codeAt is not null) return _codeAt(r, theta);
         double phi = theta - ThetaRef;
         double x = r * Math.Sin(phi), y = r * Math.Cos(phi);
         int code = OffByte;
@@ -127,7 +173,7 @@ internal sealed class DiffractionLayout
     }
 
     /// <summary>Outermost radius any picture reaches.</summary>
-    internal double OuterRadius() => Pictures.Max(p => p.PolarSpan().RMax);
+    internal double OuterRadius() => Pictures.Length == 0 ? _outerRadius : Pictures.Max(p => p.PolarSpan().RMax);
 
     /// <summary>First LBA after the recorded area: pictures plus a margin of background, on an ECC-block boundary.</summary>
     internal uint LastSector(uint totalSectors, double marginMm = 0.3)
@@ -150,7 +196,9 @@ internal sealed class DiffractionLayout
         if (slices.Count == 0) return false;
         int[] codes = t_codes ??= new int[SectorsPerBlock * PayloadBytes];
         bool[] fromString = t_fromString ??= new bool[SectorsPerBlock * PayloadBytes];
+        double[] phases = t_phases ??= new double[SectorsPerBlock * PayloadBytes];
         Array.Fill(codes, OffByte);
+        if (_phaseAt is not null) Array.Fill(phases, double.NaN);
         long firstBit = (long)lba0 * BitsPerSector;
         foreach ((int start, int stop) in slices)
         {
@@ -158,6 +206,7 @@ internal sealed class DiffractionLayout
             {
                 (double r, double theta) = _geometry.AtArcLengthFast((firstBit + BlockPayloadCentres[k]) * _bitMm);
                 codes[k] = CodeAt(r, theta);
+                if (_phaseAt is not null && codes[k] >= StringCode) phases[k] = _phaseAt(r, theta, codes[k]);
             }
         }
 
@@ -168,7 +217,8 @@ internal sealed class DiffractionLayout
             Span<byte> output = scrambled.Slice(sector * PayloadBytes, PayloadBytes);
             if (c.ContainsAnyInRange(StringCode, int.MaxValue))
             {
-                ResolveStrings(c, output, fromString.AsSpan(sector * PayloadBytes, PayloadBytes));
+                ResolveStrings(c, output, fromString.AsSpan(sector * PayloadBytes, PayloadBytes),
+                    _phaseAt is null ? default : phases.AsSpan(sector * PayloadBytes, PayloadBytes));
             }
             else
             {
@@ -192,7 +242,8 @@ internal sealed class DiffractionLayout
     /// <item>a piece followed by filler inside the frame is shortened where its length is a bad length.</item>
     /// </list>
     /// </summary>
-    internal void ResolveStrings(ReadOnlySpan<int> c, Span<byte> output, Span<bool> lit)
+    internal void ResolveStrings(ReadOnlySpan<int> c, Span<byte> output, Span<bool> lit,
+        ReadOnlySpan<double> phases = default)
     {
         const int n = PayloadBytes;
         Span<int> group = stackalloc int[n];
@@ -229,6 +280,29 @@ internal sealed class DiffractionLayout
             int value = frameStart ? 0 : sectorStart ? 2 : prevFill ? behindFiller : touching ? 2 : 0;
             bool applies = isString || (!fill && touching && !prevFill && !frameStart && !sectorStart);
             need[k] = applies ? value : 0;
+        }
+
+        if (!phases.IsEmpty)
+        {
+            // Phase lock: delay each locked piece by whole filler bytes until its string starts where the target
+            // phase, taken at the start of the byte, is closest to a whole number of cycles.
+            for (int k = 0; k < n; k++)
+            {
+                if (start[k] != k || c[k] < StringCode) continue;
+                int first = k + need[k];
+                if (first >= end[k] || double.IsNaN(phases[first])) continue;
+                double period = _stringPeriod[c[first] - StringCode];
+                int best = 0;
+                double bestError = double.PositiveInfinity;
+                for (int e = 0; e <= MaxPhaseDelayBytes && first + e < end[k] - 8; e++)
+                {
+                    double phase = phases[first + e] - 8.0 / period;
+                    double error = Math.Abs(phase - Math.Round(phase));
+                    if (error < bestError - 1e-9) (best, bestError) = (e, error);
+                }
+
+                need[k] += best;
+            }
         }
 
         for (int k = 0; k < n; k++)

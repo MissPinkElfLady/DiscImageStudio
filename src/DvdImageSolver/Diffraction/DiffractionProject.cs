@@ -19,6 +19,7 @@ namespace DvdImageSolver.Diffraction;
 ///   ]
 /// }
 /// </code>
+/// <c>"slantTest": true</c> in place of "pictures" writes the slanted-grating test disc (<see cref="SlantTestDisc"/>).
 /// Canvas: millimetres from the hub, X right, Y up, seen from the data side. Effects: "single" (one grey image on
 /// 0x92), "flip" and "stereo" (two grey images on 0x92 / 0xB9), "color" (one colour image seen by tilting, at 3 or
 /// 9 o'clock, or at 12 / 6 o'clock with a quarter turn; "copies": 1 or 2 tilts where its colours are right;
@@ -71,6 +72,12 @@ internal static class DiffractionProject
         DvdTrackGeometry geometry = DvdTrackGeometry.Create(inner, outer,
             sectors * (double)DiffractionLayout.BitsPerSector * bitNm * 1e-6, linear, quadratic, cubic);
 
+        if (root.TryGetProperty("slantTest", out JsonElement slant) && slant.ValueKind == JsonValueKind.True)
+        {
+            return new Loaded(SlantTestDisc.BuildLayout(SlantTestDisc.DefaultBands(), geometry, bitNm), (uint)sectors,
+                bitNm, inner, outer, linear, quadratic, cubic);
+        }
+
         List<DiffractionPicture> pictures = [];
         foreach (JsonElement p in root.GetProperty("pictures").EnumerateArray())
             pictures.Add(LoadPicture(p, baseDir, pictures.Count));
@@ -102,6 +109,8 @@ internal static class DiffractionProject
     /// </summary>
     internal static void WritePreview(Loaded loaded, string pngPath, double? lightClockDegrees = null, int pixels = 1200)
     {
+        if (loaded.Layout.Pictures.Length == 0)
+            throw new ArgumentException("This layout has no pictures to preview (the slant test disc has none).");
         const double DiscMm = 120.0;
         double mmPerPixel = DiscMm / pixels;
         byte[] bgra = new byte[pixels * pixels * 4];

@@ -69,6 +69,80 @@ internal static class DiffractionSelfTests
         TestColor("colour, one copy", OneCopy, 1);
         TestWideColor();
         TestColorDisc();
+        TestSlantLock();
+    }
+
+    /// <summary>
+    /// Slanted-grating test disc: at the centre of a patch, the written string's phase on neighbouring turns must step
+    /// by the band's slip (measured from the bytes and the spiral alone, not from the phase target), and unlocked
+    /// bands must not show a steady step.
+    /// </summary>
+    private static void TestSlantLock()
+    {
+        const double BitNm = 133.3;
+        const long Sectors = 2295104;
+        DvdTrackGeometry geometry = DvdTrackGeometry.Create(23.9914578, 57.9357938,
+            Sectors * (double)DiffractionLayout.BitsPerSector * BitNm * 1e-6, -2.7746e-05, 3.9380e-05, -2.5039e-05);
+        SlantTestDisc.Band[] bands = SlantTestDisc.DefaultBands();
+        DiffractionLayout layout = SlantTestDisc.BuildLayout(bands, geometry, BitNm);
+        double periodBits = SlantTestDisc.PeriodBits, bitMm = BitNm * 1e-6;
+        byte[] data = StringCarrierTable.Get(periodBits).Data;
+        byte[] block = new byte[DiffractionLayout.SectorsPerBlock * DiffractionLayout.PayloadBytes];
+        int[] centres = DiffractionLayout.BlockPayloadCentres;
+        uint cachedLba = uint.MaxValue;
+
+        // Phase (cycles) of the written pattern at an unwrapped angle, or NaN where no string piece covers it.
+        double PhaseAtAngle(double theta)
+        {
+            double bit = geometry.ArcLengthAtAngle(theta) / bitMm;
+            uint lba0 = (uint)(bit / DiffractionLayout.BitsPerSector) / 16 * 16;
+            if (lba0 != cachedLba)
+            {
+                if (!layout.FillBlock(lba0, block)) return double.NaN;
+                cachedLba = lba0;
+            }
+
+            double local = bit - (double)lba0 * DiffractionLayout.BitsPerSector;
+            int k = Array.BinarySearch(centres, (int)Math.Floor(local));
+            k = k < 0 ? ~k - 1 : k;
+            // Walk back to the piece start: the first byte of the frame that matches the string from its start.
+            for (int back = 0; back <= 91 && k - back >= 0; back++)
+            {
+                int s = k - back;
+                if (centres[k] - centres[s] > 91 * 16) break;
+                bool match = s + 6 <= block.Length && block.AsSpan(s, 6).SequenceEqual(data.AsSpan(0, 6))
+                    && block.AsSpan(s, k - s + 1).SequenceEqual(data.AsSpan(0, k - s + 1));
+                if (match) return (local - (centres[s] - 8)) / periodBits;
+            }
+
+            return double.NaN;
+        }
+
+        foreach (SlantTestDisc.Band band in bands.Where(b => b.BlockTurns == 0))
+        {
+            double r = (band.InnerMm + band.OuterMm) / 2;
+            double theta0 = geometry.AngleAtRadius(r);
+            double patch = SlantTestDisc.PatchDegrees * Math.PI / 180.0;
+            int good = 0, total = 0;
+            for (int p = 0; p < 36; p += 5)
+            {
+                double centre = (Math.Floor(theta0 / (2 * Math.PI)) * 2 * Math.PI) + (p + 0.5) * patch;
+                for (int turn = 0; turn < 6; turn++)
+                {
+                    double a = PhaseAtAngle(centre + turn * 2 * Math.PI), b = PhaseAtAngle(centre + (turn + 1) * 2 * Math.PI);
+                    if (double.IsNaN(a) || double.IsNaN(b)) continue;
+                    double step = b - a - (band.Slip ?? 0);
+                    total++;
+                    if (Math.Abs(step - Math.Round(step)) < 0.1) good++;
+                }
+            }
+
+            Check(total >= 20, $"slant test {band.Label}: enough samples ({total})");
+            if (band.Slip is null)
+                Check(good < total * 0.6, $"slant test {band.Label}: unlocked band has no steady step ({good}/{total})");
+            else
+                Check(good >= total * 0.9, $"slant test {band.Label}: turn-to-turn step equals the slip ({good}/{total})");
+        }
     }
 
     // make_color_vectors.py (--copies 2 and --copies 1): DiscDiffractStudio's colour flip of the channels below
