@@ -2,11 +2,11 @@
 
 [简体中文](README.md) | [繁體中文](README.zh-TW.md) | [English](README.en.md) | [日本語](README.ja.md) | [Türkçe](README.tr.md) | [Español](README.es.md) | **Čeština** | [Português (Brasil)](README.pt-BR.md)
 
-![Banner](docs/images/DiscImageStudio_Banner_2.png)
+![Banner](docs/images/DIS-C.png)
 
 <h2>Všestranný nástroj pro generování a vypalování viditelných obrazů na optické disky</h2>
 
-Disc Image Studio je multiplatformní nástroj pro generování a vypalování obrazů na povrch disků, který vám pomůže vypálit obrazy viditelné pouhým okem na jakýkoli DVD / CD / jednovrstvý Blu-ray disk pomocí jakékoli vypalovací mechaniky.
+Disc Image Studio Chroma je multiplatformní nástroj pro generování a vypalování obrazů na povrch disků, který vám pomůže vypálit obrazy viditelné pouhým okem na jakýkoli DVD / CD / jednovrstvý Blu-ray disk pomocí jakékoli vypalovací mechaniky.
 
 ![Verze .NET](https://img.shields.io/badge/.NET-10.0-512bd4?style=flat-square)
 ![Platforma](https://img.shields.io/badge/Platform-Windows%20%7C%20Linux%20%7C%20macOS-0078d6?style=flat-square)

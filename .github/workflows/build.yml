@@ -49,7 +49,7 @@ jobs:
       - name: Publish and archive the self-contained CLI
         shell: bash
         run: |
-          archive="DiscImageStudio-CLI-$PACKAGE_TAG-$RID.tar.gz"
+          archive="DiscImageStudio-Chroma-CLI-$PACKAGE_TAG-$RID.tar.gz"
           dotnet publish src/DiscImageStudio.Cli/DiscImageStudio.Cli.csproj \
             -c Release -r "$RID" --self-contained true -o "$RUNNER_TEMP/publish" \
             -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true
@@ -62,7 +62,7 @@ jobs:
         shell: bash
         run: |
           mkdir "$RUNNER_TEMP/cli-smoke"
-          tar -xzf "artifacts/cli/DiscImageStudio-CLI-$PACKAGE_TAG-$RID.tar.gz" -C "$RUNNER_TEMP/cli-smoke"
+          tar -xzf "artifacts/cli/DiscImageStudio-Chroma-CLI-$PACKAGE_TAG-$RID.tar.gz" -C "$RUNNER_TEMP/cli-smoke"
           python3 tests/test_cli_package.py "$RUNNER_TEMP/cli-smoke/disc-image-studio"
 
       - uses: actions/upload-artifact@v4

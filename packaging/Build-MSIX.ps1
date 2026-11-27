@@ -5,8 +5,8 @@ param(
     [Parameter(Mandatory = $true)]
     [string]$Publisher,
 
-    [string]$PublisherDisplayName = "Disc Image Studio",
-    [string]$DisplayName = "Disc Image Studio 光盘绘图工坊",
+    [string]$PublisherDisplayName = "Disc Image Studio Chroma",
+    [string]$DisplayName = "Disc Image Studio Chroma 光盘绘图工坊",
     [ValidatePattern('^\d+\.\d+\.\d+\.\d+$')]
     [string]$Version,
     [string]$CertificateThumbprint,

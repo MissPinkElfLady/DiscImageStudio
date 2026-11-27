@@ -2,11 +2,11 @@
 
 [简体中文](README.md) | [繁體中文](README.zh-TW.md) | [English](README.en.md) | **日本語** | [Türkçe](README.tr.md) | [Español](README.es.md) | [Čeština](README.cs.md) | [Português (Brasil)](README.pt-BR.md)
 
-![Banner](docs/images/DiscImageStudio_Banner_2.png)
+![Banner](docs/images/DIS-C.png)
 
 <h2>光ディスクの記録面に可視画像を生成・書き込みするオールインワンツール</h2>
 
-Disc Image Studio は、あらゆる記録ドライブを使って、あらゆる DVD / CD / 単層 Blu-ray ディスクの記録面に肉眼で見える画像を刻むための、マルチプラットフォーム対応のディスク記録面画像生成・書き込みツールです。
+Disc Image Studio Chroma は、あらゆる記録ドライブを使って、あらゆる DVD / CD / 単層 Blu-ray ディスクの記録面に肉眼で見える画像を刻むための、マルチプラットフォーム対応のディスク記録面画像生成・書き込みツールです。
 
 ![.NET バージョン](https://img.shields.io/badge/.NET-10.0-512bd4?style=flat-square)
 ![対応プラットフォーム](https://img.shields.io/badge/Platform-Windows%20%7C%20Linux%20%7C%20macOS-0078d6?style=flat-square)

@@ -1,8 +1,8 @@
-# Disc Image Studio 隐私政策
+# Disc Image Studio Chroma 隐私政策
 
 生效日期：2026 年 11 月 9 日
 
-Disc Image Studio（光盘绘图工坊）是一款完全在 Windows 设备本地运行的光盘镜像生成工具。
+Disc Image Studio Chroma（光盘绘图工坊）是一款完全在 Windows 设备本地运行的光盘镜像生成工具。
 
 ## 数据处理
 

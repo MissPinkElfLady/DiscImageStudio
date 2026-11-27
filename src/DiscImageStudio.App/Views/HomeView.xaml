@@ -10,7 +10,7 @@
         <!-- MaxWidth alone centers this column: Stretch + MaxWidth arranges it at 1120 and
              WPF centers the capped element, so the sections span the full page column. -->
         <StackPanel MaxWidth="1120" Margin="{StaticResource PagePadding}">
-            <TextBlock Text="Disc Image Studio" Style="{StaticResource H1Title}" />
+            <TextBlock Text="Disc Image Studio Chroma" Style="{StaticResource H1Title}" />
             <TextBlock Style="{StaticResource PageSubtitle}" Margin="0,8,0,0"
                        Text="{loc:Text Xaml.CreateAndBurnVisibleArtworkOnOpticalDiscs}" />
 

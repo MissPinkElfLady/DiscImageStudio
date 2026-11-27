@@ -30,7 +30,7 @@ if (-not (Test-Path -LiteralPath $releaseRoot -PathType Container)) {
 
 $assets = [ordered]@{}
 foreach ($rid in 'win-x64', 'win-arm64') {
-    $fileName = "DiscImageStudio-$Tag-$rid.exe"
+    $fileName = "DiscImageStudio-Chroma-$Tag-$rid.exe"
     $path = Join-Path $releaseRoot $fileName
     if (-not (Test-Path -LiteralPath $path -PathType Leaf)) {
         throw "Missing tested package: $fileName"

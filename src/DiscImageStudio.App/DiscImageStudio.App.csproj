@@ -13,10 +13,10 @@
     <StartupObject>DiscImageStudio.Program</StartupObject>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <ApplicationIcon>Assets\DiscImageStudio.ico</ApplicationIcon>
-    <Title>Disc Image Studio</Title>
-    <Product>Disc Image Studio</Product>
+    <Title>Disc Image Studio Chroma</Title>
+    <Product>Disc Image Studio Chroma</Product>
     <Description>Create and stream-burn image-mapped CD audio tracks and DVD data discs.</Description>
-    <Company>Disc Image Studio</Company>
+    <Company>Disc Image Studio Chroma</Company>
     <Copyright>Copyright © 2026</Copyright>
     <NeutralLanguage>zh-CN</NeutralLanguage>
     <PublishSingleFile>true</PublishSingleFile>

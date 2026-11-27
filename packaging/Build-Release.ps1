@@ -98,7 +98,7 @@ if (Test-Path -LiteralPath $referencedRuntimeConfig) {
     Remove-Item -LiteralPath $referencedRuntimeConfig -Force
 }
 
-$packageFileName = "DiscImageStudio-$($metadata.Tag)-$RuntimeIdentifier.exe"
+$packageFileName = "DiscImageStudio-Chroma-$($metadata.Tag)-$RuntimeIdentifier.exe"
 $packagePath = Join-Path $releaseDirectory $packageFileName
 Copy-Item -LiteralPath $publishedExecutable -Destination $packagePath
 $peInfo = & (Join-Path $PSScriptRoot 'Assert-WindowsReleaseExecutable.ps1') `

@@ -8,7 +8,7 @@ internal static class Program
     {
         if (args.Length == 0 || args[0] is "--help" or "-h" or "help")
         {
-            Console.WriteLine("Disc Image Studio | experimental Linux and macOS CLI for offline CD, DVD and Blu-ray image generation");
+            Console.WriteLine("Disc Image Studio Chroma | experimental Linux and macOS CLI for offline CD, DVD and Blu-ray image generation");
             Console.WriteLine("Usage: disc-image-studio COMMAND [OPTIONS]");
             foreach (IOpticalDiscModule module in ConsoleModuleRunner.Catalog.Modules)
             {

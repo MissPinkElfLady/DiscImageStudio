@@ -1034,14 +1034,14 @@
     "es": "Parámetros predeterminados",
     "cs": "Výchozí parametry"
   },
-  "Disc Image Studio 工程|*.discproj": {
-    "zh-CN": "Disc Image Studio 工程|*.discproj",
-    "en": "Disc Image Studio project|*.discproj",
-    "zh-TW": "Disc Image Studio 專案|*.discproj",
-    "ja": "Disc Image Studio プロジェクト|*.discproj",
-    "tr": "Disc Image Studio projesi|*.discproj",
-    "es": "Proyecto de Disc Image Studio|*.discproj",
-    "cs": "Projekt Disc Image Studio|*.discproj"
+  "Disc Image Studio Chroma 工程|*.discproj": {
+    "zh-CN": "Disc Image Studio Chroma 工程|*.discproj",
+    "en": "Disc Image Studio Chroma project|*.discproj",
+    "zh-TW": "Disc Image Studio Chroma 專案|*.discproj",
+    "ja": "Disc Image Studio Chroma プロジェクト|*.discproj",
+    "tr": "Disc Image Studio Chroma projesi|*.discproj",
+    "es": "Proyecto de Disc Image Studio Chroma|*.discproj",
+    "cs": "Projekt Disc Image Studio Chroma|*.discproj"
   },
   "标准 80min CD": {
     "zh-CN": "标准 80min CD",

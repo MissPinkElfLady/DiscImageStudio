@@ -67,7 +67,7 @@ if ($null -eq $installedPackage) {
 }
 
 Write-Host ""
-Write-Host "Disc Image Studio Test installed successfully." -ForegroundColor Green
-Write-Host "Open it from the Start menu by searching for: Disc Image Studio Test"
+Write-Host "Disc Image Studio Chroma Test installed successfully." -ForegroundColor Green
+Write-Host "Open it from the Start menu by searching for: Disc Image Studio Chroma Test"
 Write-Host "Press Enter to close this window."
 [void](Read-Host)

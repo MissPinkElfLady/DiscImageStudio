@@ -132,10 +132,10 @@ jobs:
           $manifest = Join-Path $directory 'SHA256SUMS.txt'
           $packages = @()
           foreach ($rid in 'win-x64','win-arm64') {
-            $packages += "DiscImageStudio-$($metadata.Tag)-$rid.exe"
+            $packages += "DiscImageStudio-Chroma-$($metadata.Tag)-$rid.exe"
           }
           foreach ($rid in 'linux-x64','linux-arm64','osx-x64','osx-arm64') {
-            $packages += "DiscImageStudio-CLI-$($metadata.Tag)-$rid.tar.gz"
+            $packages += "DiscImageStudio-Chroma-CLI-$($metadata.Tag)-$rid.tar.gz"
           }
           # Artifact uploads may retain version/RID directories. Flatten only the
           # six expected packages after checking their adjacent checksum files.
@@ -176,7 +176,7 @@ jobs:
             'Use Get-FileHash on Windows, sha256sum on Linux or shasum -a 256 on macOS and compare the result with the entry for your filename.'
             ''
             '```powershell'
-            "Get-FileHash .\DiscImageStudio-$($metadata.Tag)-win-x64.exe -Algorithm SHA256"
+            "Get-FileHash .\DiscImageStudio-Chroma-$($metadata.Tag)-win-x64.exe -Algorithm SHA256"
             '```'
             ''
             '```text'
@@ -283,7 +283,7 @@ jobs:
           $assets = @(Get-ChildItem -Path 'release/*.exe','release/*.tar.gz' -File | ForEach-Object FullName)
           $assets += 'release/latest.json'
           $assets += 'release/SHA256SUMS.txt'
-          $options = @('--title', "Disc Image Studio $env:RELEASE_TAG", '--notes-file', 'release/release-notes.md')
+          $options = @('--title', "Disc Image Studio Chroma $env:RELEASE_TAG", '--notes-file', 'release/release-notes.md')
           if ($existing.Count -eq 1) {
             gh release upload $env:RELEASE_TAG @assets --clobber
             if ($LASTEXITCODE -ne 0) { throw 'Release asset upload failed.' }

@@ -6,7 +6,7 @@
 
 <h2>全能的光盘盘面可见图像生成与刻录工具</h2>
 
-Disc Image Studio 是一个多平台的光盘盘面图像生成与刻录工具，可在兼容的 DVD、CD 和单层蓝光盘上刻出肉眼可见的图像。
+Disc Image Studio Chroma 是一个多平台的光盘盘面图像生成与刻录工具，可在兼容的 DVD、CD 和单层蓝光盘上刻出肉眼可见的图像。
 
 ![.NET 版本](https://img.shields.io/badge/.NET-10.0-512bd4?style=flat-square)
 ![运行平台](https://img.shields.io/badge/Platform-Windows%20%7C%20Linux%20%7C%20macOS-0078d6?style=flat-square)
@@ -71,7 +71,7 @@ Disc Image Studio 是一个多平台的光盘盘面图像生成与刻录工具�
 
 ## 概述
 
-Disc Image Studio 可将图片转换为适合 CD、DVD 与单层蓝光绘图的数据。
+Disc Image Studio Chroma 可将图片转换为适合 CD、DVD 与单层蓝光绘图的数据。
 
 ## 界面预览
 
@@ -99,7 +99,7 @@ Disc Image Studio 可将图片转换为适合 CD、DVD 与单层蓝光绘图的�
 
 ## 刻录与介质安全须知
 
-- Disc Image Studio 不安装驱动或服务；“即时刻录”功能使用了 Windows 自带的 IMAPI2，拒绝非空白介质。
+- Disc Image Studio Chroma 不安装驱动或服务；“即时刻录”功能使用了 Windows 自带的 IMAPI2，拒绝非空白介质。
 - “即时刻录”功能已有部分实盘反馈，对不同设备、介质与刻录入口的验证覆盖仍有限，属于实验性功能，请只使用可报废的测试介质。刻录中断、断电或生成速度不足仍可能使盘片报废！
 - 实际可见效果取决于盘片、刻录机、固件与写入策略。
 - 混合文件夹会在开始刻录前扫描目录并固定布局；期间源文件大小改变会安全终止任务，已开始写入的盘片仍可能报废。
@@ -107,7 +107,7 @@ Disc Image Studio 可将图片转换为适合 CD、DVD 与单层蓝光绘图的�
 
 ## 隐私与安全
 
-- Disc Image Studio 除您在关于页手动检查更新时访问 GitHub Releases 外，不联网、不上传文件、不收集遥测，详见[隐私政策](PRIVACY.md)。
+- Disc Image Studio Chroma 除您在关于页手动检查更新时访问 GitHub Releases 外，不联网、不上传文件、不收集遥测，详见[隐私政策](PRIVACY.md)。
 - 发现安全问题请不要在公开 Issue 中披露，按[安全政策](SECURITY.md)使用 GitHub 私密报告。
 
 ## 贡献

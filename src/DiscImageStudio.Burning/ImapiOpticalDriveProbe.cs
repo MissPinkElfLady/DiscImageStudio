@@ -431,7 +431,7 @@ public sealed class ImapiOpticalDriveProbe : IOpticalDriveProbe
         {
             format = ImapiCom.CreateComObject("IMAPI2.MsftDiscFormat2Data");
             format.Recorder = recorder;
-            format.ClientName = "Disc Image Studio";
+            format.ClientName = "Disc Image Studio Chroma";
             long total = Convert.ToInt64(format.TotalSectorsOnMedia);
             long free = Convert.ToInt64(format.FreeSectorsOnMedia);
             return total > 0 && free >= 0 ? (total, free) : null;

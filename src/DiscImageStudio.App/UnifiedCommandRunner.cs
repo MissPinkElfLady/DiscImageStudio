@@ -100,7 +100,7 @@ internal static class UnifiedCommandRunner
     {
         Console.WriteLine(
             """
-            Disc Image Studio - modular CD/DVD/Blu-ray optical-disc image generator
+            Disc Image Studio Chroma - modular CD/DVD/Blu-ray optical-disc image generator
 
             Start without arguments to open the graphical interface.
             Disc commands are provided by modules through DiscImageStudio.Core.

@@ -1,5 +1,5 @@
 {
-  // Disc calibration: point "discproj" at a DVD project saved by Disc Image Studio after calibration,
+  // Disc calibration: point "discproj" at a DVD project saved by Disc Image Studio Chroma after calibration,
   // or give the numbers under "geometry" instead.
   "discproj": "MyDVDCalibration.discproj",
   "pictures": [

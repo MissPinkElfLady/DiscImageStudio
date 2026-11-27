@@ -2,11 +2,11 @@
 
 [简体中文](README.md) | [繁體中文](README.zh-TW.md) | **English** | [日本語](README.ja.md) | [Türkçe](README.tr.md) | [Español](README.es.md) | [Čeština](README.cs.md) | [Português (Brasil)](README.pt-BR.md)
 
-![Banner](docs/images/DiscImageStudio_Banner_2.png)
+![Banner](docs/images/DIS-C.png)
 
 <h2>An all-in-one tool for generating and burning visible images onto optical discs</h2>
 
-Disc Image Studio is a multi-platform disc-surface image generation and burning tool that helps you etch images visible to the naked eye onto any DVD / CD / single-layer Blu-ray disc with any recorder.
+Disc Image Studio Chroma is a multi-platform disc-surface image generation and burning tool that helps you etch images visible to the naked eye onto any DVD / CD / single-layer Blu-ray disc with any recorder.
 
 ![.NET version](https://img.shields.io/badge/.NET-10.0-512bd4?style=flat-square)
 ![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20Linux%20%7C%20macOS-0078d6?style=flat-square)
@@ -83,7 +83,7 @@ The fork stays under the [GNU GPL v3.0 or later](LICENSE), the same as upstream.
 
 ## Overview
 
-Disc Image Studio converts an image into data that meets the physical-layer constraints of CD, DVD, and single-layer BD-R discs. After burning, the disc surface displays a pattern visible to the naked eye.
+Disc Image Studio Chroma converts an image into data that meets the physical-layer constraints of CD, DVD, and single-layer BD-R discs. After burning, the disc surface displays a pattern visible to the naked eye.
 
 ## Interface Preview
 
@@ -118,7 +118,7 @@ The copies of those documents in this repository match upstream at the point the
 
 ## Burning and Media Safety
 
-- Disc Image Studio does not install drivers or services. Live burning uses Windows’ built-in IMAPI2 and rejects non-blank media.
+- Disc Image Studio Chroma does not install drivers or services. Live burning uses Windows’ built-in IMAPI2 and rejects non-blank media.
 - Live burning has received some feedback from physical disc tests, but validation coverage across different devices, media, and burning paths remains limited. It is experimental; use only expendable test media. Interrupted burning, power loss, or insufficient generation speed may still render a disc unusable!
 - The actual visible result depends on the disc, recorder, firmware, and write strategy.
 - For hybrid discs, the source folder is scanned and its layout is fixed before burning starts. If a source file’s size changes during the operation, the job is safely terminated; a disc that has already started writing may still become unusable.
@@ -126,7 +126,7 @@ The copies of those documents in this repository match upstream at the point the
 
 ## Privacy and Security
 
-- Except when the user manually checks for updates on the About page, Disc Image Studio does not access the network, upload files, or collect telemetry. See the [privacy policy](PRIVACY.md).
+- Except when the user manually checks for updates on the About page, Disc Image Studio Chroma does not access the network, upload files, or collect telemetry. See the [privacy policy](PRIVACY.md).
 - Do not disclose security issues in public issues. Follow the [security policy](SECURITY.md) and use GitHub’s private reporting feature.
 
 ## Contributing

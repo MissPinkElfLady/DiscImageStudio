@@ -56,7 +56,7 @@ public sealed class WindowsImapiBurner : IOpticalDiscBurner
             recorder = ImapiCom.CreateRecorder(deviceId);
             format = ImapiCom.CreateComObject("IMAPI2.MsftDiscFormat2Data");
             format.Recorder = recorder;
-            format.ClientName = "Disc Image Studio";
+            format.ClientName = "Disc Image Studio Chroma";
             int physicalMediaType = ValidateRequestedMedia(mediaKind, (object)recorder, (object)format);
             // These are media queries. PrepareMedia would enter a recording session.
             OpticalMediaCapacity capacity;
@@ -286,7 +286,7 @@ public sealed class WindowsImapiBurner : IOpticalDiscBurner
                 ? ImapiCom.CreateComObject("IMAPI2.MsftDiscFormat2RawCD")
                 : ImapiCom.CreateComObject("IMAPI2.MsftDiscFormat2Data");
             format.Recorder = recorder;
-            format.ClientName = "Disc Image Studio";
+            format.ClientName = "Disc Image Studio Chroma";
             int physicalMediaType = ValidateRequestedMedia(mediaKind, (object)recorder, (object)format);
             if (mediaKind == OpticalBurnMediaKind.BluRayData && physicalMediaType == BluRayRewritableMediaType)
             {
@@ -375,7 +375,7 @@ public sealed class WindowsImapiBurner : IOpticalDiscBurner
                 : ImapiCom.CreateComObject("IMAPI2.MsftDiscFormat2Data");
             currentOperation = "连接刻录机";
             format.Recorder = recorder;
-            format.ClientName = "Disc Image Studio";
+            format.ClientName = "Disc Image Studio Chroma";
             BurnDeviceDiagnostics.Report(ReportDiagnostic, () => physicalMediaDiagnostic = BurnDeviceDiagnostics.DescribePhysicalMedia((object)format));
             currentOperation = "检查当前盘片兼容性";
             int physicalMediaType = ValidateRequestedMedia(request.MediaKind, (object)recorder, (object)format);
@@ -554,7 +554,7 @@ public sealed class WindowsImapiBurner : IOpticalDiscBurner
                             format = null;
                             format = ImapiCom.CreateComObject("IMAPI2.MsftDiscFormat2Data");
                             format.Recorder = recorder;
-                            format.ClientName = "Disc Image Studio";
+                            format.ClientName = "Disc Image Studio Chroma";
                             ValidateRequestedMedia(request.MediaKind, recorder, format);
                             if (Convert.ToInt32(format.CurrentPhysicalMediaType) != mediaType)
                                 throw new InvalidOperationException("盘片已更换，请重新开始刻录。");
@@ -1435,7 +1435,7 @@ public sealed class WindowsImapiBurner : IOpticalDiscBurner
             if (!(bool)eraser.IsRecorderSupported(recorder) || !(bool)eraser.IsCurrentMediaSupported(recorder))
                 throw new InvalidOperationException("Windows 刻录接口无法擦除当前 DVD±RW。");
             eraser.Recorder = recorder;
-            eraser.ClientName = "Disc Image Studio";
+            eraser.ClientName = "Disc Image Studio Chroma";
             eraser.FullErase = false;
             eraser.EraseMedia();
         }

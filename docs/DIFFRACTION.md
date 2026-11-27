@@ -1,6 +1,6 @@
 # DVD diffraction pictures (experimental)
 
-Disc Image Studio's normal DVD picture is already a diffraction effect in disguise: light areas carry the
+Disc Image Studio Chroma's normal DVD picture is already a diffraction effect in disguise: light areas carry the
 scrambled byte `0x92`, whose EFMPlus marks repeat every 16 channel bits (2.13 µm), and dark areas carry
 `0xA5` (6.4T). The `diffract` command goes further. It writes several such gratings, each with its own
 period, so that different pictures are seen from different directions: a two-frame flip that switches as
